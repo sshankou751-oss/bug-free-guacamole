@@ -4,10 +4,9 @@ import Auth from "./components/Auth"
 import EhonForest from "./components/EhonForest"
 import BookViewer from "./components/BookViewer"
 import CreateBook from "./components/CreateBook"
-import PictureBookChat from "./components/PictureBookChat"
 import CuteButton from "./components/CuteButton"
 import MyBooks from "./components/MyBooks"
-import { LogOut, Apple, Plus, Star, MessageCircle, LogIn } from "lucide-react"
+import { LogOut, Apple, Plus, Star, LogIn } from "lucide-react"
 import "./App.css"
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [viewState, setViewState] = useState("list")
   const [selectedBookId, setSelectedBookId] = useState(null)
-  const [initialStoryData, setInitialStoryData] = useState(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -44,7 +42,6 @@ function App() {
 
   const handleBackToList = () => {
     setSelectedBookId(null)
-    setInitialStoryData(null)
     setViewState("list")
   }
 
@@ -56,18 +53,6 @@ function App() {
   const handleShowMyBooks = () => {
     if (!session) { setViewState("auth") } else { setViewState("mybooks") }
     setSelectedBookId(null)
-  }
-
-  const handleStartChat = () => {
-    if (!session) { setViewState("auth") } else { setViewState("chat") }
-    setSelectedBookId(null)
-    setInitialStoryData(null)
-  }
-
-  const handleCreateFromChat = (storyData) => {
-    if (!storyData) { handleBackToList(); return }
-    setInitialStoryData(storyData)
-    setViewState("create")
   }
 
   const handleCreateComplete = () => { setViewState("mybooks") }
@@ -97,15 +82,11 @@ function App() {
           </div>
 
           <div className="header-actions flex items-center gap-6">
-            {viewState !== "create" && viewState !== "mybooks" && viewState !== "chat" && viewState !== "auth" && !selectedBookId && (
+            {viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
               <>
                 <button onClick={handleShowMyBooks} className="hidden lg:flex items-center gap-3 px-8 py-3 bg-[#f0ffcc] text-[#2d4a22] font-black rounded-full hover:bg-[#ccff00] transition-all border-2 border-[#ccff00] shadow-md hover:shadow-lg active:translate-y-0.5">
                   <Star className="w-5 h-5 fill-current" />
                   きみの作品
-                </button>
-                <button onClick={handleStartChat} className="flex items-center gap-3 px-8 py-3 bg-white text-[#2d4a22] font-black rounded-full border-2 border-[#ccff00] hover:bg-[#ccff00] transition-all shadow-md hover:shadow-lg active:translate-y-0.5">
-                  <MessageCircle className="w-5 h-5" />
-                  チャットで作る
                 </button>
                 <button onClick={handleStartCreating} className="flex items-center gap-3 px-10 py-4 bg-[#2d4a22] text-[#ccff00] font-black rounded-[2rem] shadow-[0_8px_0_#1a2e14] hover:shadow-[0_4px_0_#1a2e14] hover:translate-y-1 active:translate-y-2 transition-all text-lg">
                   <Plus className="w-6 h-6 stroke-[5px]" />
@@ -113,7 +94,7 @@ function App() {
                 </button>
               </>
             )}
-            {(selectedBookId || viewState === "create" || viewState === "mybooks" || viewState === "chat" || viewState === "auth") && (
+            {(selectedBookId || viewState === "create" || viewState === "mybooks" || viewState === "auth") && (
               <button onClick={handleBackToList} className="px-10 py-3 bg-white text-[#2d4a22] font-black rounded-full border-[6px] border-[#ccff00] hover:bg-[#f7fff0] transition-colors shadow-lg active:translate-y-1">
                 もどる
               </button>
@@ -138,7 +119,7 @@ function App() {
         {viewState === "create" ? (
           <div className="container py-20 px-8">
             <div className="bg-white/80 backdrop-blur-xl rounded-[4rem] border-8 border-[#ccff00] p-12 shadow-[0_40px_100px_rgba(204,255,0,0.15)] animate-in fade-in zoom-in duration-500">
-              <CreateBook onCancel={handleBackToList} onComplete={handleCreateComplete} initialData={initialStoryData} />
+              <CreateBook onCancel={handleBackToList} onComplete={handleCreateComplete} />
             </div>
           </div>
         ) : viewState === "mybooks" ? (
@@ -149,10 +130,6 @@ function App() {
           </div>
         ) : viewState === "viewer" && selectedBookId ? (
           <BookViewer bookId={selectedBookId} />
-        ) : viewState === "chat" ? (
-          <div className="container py-20 px-8">
-            <PictureBookChat onCancel={handleCreateFromChat} />
-          </div>
         ) : viewState === "auth" ? (
           <Auth />
         ) : (
