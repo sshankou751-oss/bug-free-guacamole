@@ -55,7 +55,13 @@ export default function MyBooks({ onSelectBook }) {
         await supabase.storage.from('picture-books').remove(paths)
       }
       
-      // 2. Delete database record
+      // 2. book_pages を削除
+      await supabase
+        .from('book_pages')
+        .delete()
+        .eq('book_id', bookId)
+
+      // 3. books を削除
       const { error } = await supabase
         .from('books')
         .delete()
@@ -63,7 +69,7 @@ export default function MyBooks({ onSelectBook }) {
 
       if (error) throw error
 
-      setBooks(books.filter(b => b.id !== bookId))
+      setBooks(prev => prev.filter(b => b.id !== bookId))
 
     } catch (err) {
       alert('削除に失敗しました: ' + err.message)

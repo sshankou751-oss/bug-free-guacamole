@@ -1,141 +1,218 @@
-.book-viewer {
+/* ===== Book Viewer ===== */
+.bv-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 80vh;
-  perspective: 1500px;
-  overflow: hidden;
-  padding: 2rem;
+  padding: 2rem 1rem;
+  background: linear-gradient(160deg, #f7fff0 0%, #e8f5d4 100%);
+  user-select: none;
 }
 
-.book-wrapper {
-  position: relative;
-  width: 800px; /* Adjust based on functionality */
-  height: 600px;
-  transform-style: preserve-3d;
-  transition: transform 0.5s;
+.bv-title {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 900;
+  color: #2d4a22;
+  margin-bottom: 1.5rem;
+  font-family: 'Hiragino Maru Gothic Pro', 'Hiragino Sans', sans-serif;
+  letter-spacing: 0.05em;
 }
 
-/* Mobile responsive */
-@media (max-width: 850px) {
-  .book-wrapper {
-    width: 90vw;
-    height: 67.5vw; /* 4:3 aspect ratio */
-  }
-}
-
-.book-page-sheet {
-  position: absolute;
-  top: 0;
-  left: 0; /* Center handling might differ */
-  width: 50%;
-  height: 100%;
-  transform-origin: right center;
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.book-page-sheet.flipped {
-  transform: rotateY(-180deg);
-}
-
-.book-page-sheet.z-top {
-  z-index: 10;
-}
-.book-page-sheet.z-mid {
-  z-index: 5;
-}
-.book-page-sheet.z-bot {
-  z-index: 1;
-}
-
-.page-front,
-.page-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid #eee;
-}
-
-.page-back {
-  transform: rotateY(180deg);
-}
-
-.page-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* or contain */
-}
-
-.page-number {
-  position: absolute;
-  bottom: 10px;
-  font-size: 0.8rem;
-  color: #555;
-  background: rgba(255,255,255,0.8);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.page-front .page-number {
-  right: 10px;
-}
-
-.page-back .page-number {
-  left: 10px;
-}
-
-.book-controls {
-  margin-top: 2rem;
+/* ===== Book area (nav + page) ===== */
+.bv-book-area {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
 }
 
-.btn-control {
-  background-color: #34495e;
-  color: white;
+/* ===== Page wrapper ===== */
+.bv-page-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 700px;
+  aspect-ratio: 4 / 3;
+  border-radius: 4px 16px 16px 4px;
+  box-shadow:
+    -6px 0 18px rgba(0,0,0,0.12),
+    8px 8px 30px rgba(0,0,0,0.18),
+    0 0 0 1px rgba(0,0,0,0.06);
+  overflow: hidden;
+  background: white;
+}
+
+.bv-book-shadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.12), transparent);
+  z-index: 2;
+  border-right: 2px solid rgba(0,0,0,0.06);
+}
+
+.bv-page {
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.bv-slide-out-left {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+.bv-slide-out-right {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+
+.bv-slide-in {
+  animation: bv-fade-in 0.3s ease;
+}
+@keyframes bv-fade-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.bv-page-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #fafafa;
+}
+
+/* Page curl */
+.bv-page-curl {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(225deg, #e0e0e0 40%, transparent 40%);
+  opacity: 0.4;
+  z-index: 3;
+}
+
+/* ===== Nav buttons ===== */
+.bv-nav-btn {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 20px;
+  background: #2d4a22;
+  color: #ccff00;
+  font-size: 2.2rem;
+  line-height: 1;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(45,74,34,0.3);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s, background 0.2s;
+}
+.bv-nav-btn:hover:not(:disabled) {
+  background: #ccff00;
+  color: #2d4a22;
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(204,255,0,0.4);
+}
+.bv-nav-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+.bv-nav-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
 }
 
-.btn-control:hover:not(:disabled) {
-  background-color: #2c3e50;
-  transform: translateY(-2px);
+/* ===== Progress dots ===== */
+.bv-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 600px;
+}
+.bv-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #2d4a22;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+.bv-dot-active {
+  background: #2d4a22;
+  transform: scale(1.3);
+}
+.bv-dot:hover:not(.bv-dot-active) {
+  background: #ccff00;
+  border-color: #ccff00;
 }
 
-.btn-control:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
+/* ===== Page counter ===== */
+.bv-counter {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: #2d4a22;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+.bv-counter-current {
+  font-size: 1.2rem;
+  color: #2d4a22;
+}
+.bv-counter-sep {
+  margin: 0 4px;
+  opacity: 0.5;
 }
 
-.page-indicator {
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  color: #7f8c8d;
-}
-
-.book-viewer-loading,
-.book-viewer-error,
-.book-viewer-empty {
+/* ===== Loading / Error / Empty ===== */
+.bv-loading,
+.bv-error,
+.bv-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 50vh;
-  color: #7f8c8d;
+  gap: 1rem;
+  color: #2d4a22;
+  font-size: 1.1rem;
+}
+.bv-spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #ccff00;
+  border-top-color: #2d4a22;
+  border-radius: 50%;
+  animation: bv-spin 0.8s linear infinite;
+}
+@keyframes bv-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 600px) {
+  .bv-book-area {
+    gap: 0.75rem;
+  }
+  .bv-nav-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.8rem;
+  }
+  .bv-title {
+    font-size: 1.2rem;
+    text-align: center;
+  }
 }

@@ -1,48 +1,47 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import './BookViewer.css'
 
 export default function BookViewer({ bookId }) {
+  const [book, setBook] = useState(null)
   const [pages, setPages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  // currentSpreadIndex: 0 (Cover), 1 (Pages 1-2), etc.
-  // Actually, let's treat pages as individual items in an array.
-  // We will display them as sheets.
-  // Sheet 0: Front=Page0(Cover?), Back=Page1
-  // Sheet 1: Front=Page2, Back=Page3
-  // ...
-  // But our 'pages' array from DB is just a list of images.
-  // Let's assume Page 0 is standalone right (Title page), then 1-2, 3-4.
-  // Simplification: Just mapped array.
-  // Sheet i represents pages[2*i] and pages[2*i+1].
-  const [currentSheetIndex, setCurrentSheetIndex] = useState(0)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [direction, setDirection] = useState('next')
+  const [animating, setAnimating] = useState(false)
+  const animTimerRef = useRef(null)
 
   useEffect(() => {
-    fetchBookPages()
+    fetchBook()
   }, [bookId])
 
-  const fetchBookPages = async () => {
+  const fetchBook = async () => {
     try {
       setLoading(true)
       setError(null)
+
+      const { data: bookData, error: bookError } = await supabase
+        .from('books')
+        .select('*')
+        .eq('id', bookId)
+        .single()
+      if (bookError) throw bookError
+      setBook(bookData)
 
       const { data, error } = await supabase
         .from('book_pages')
         .select('*')
         .eq('book_id', bookId)
         .order('page_number', { ascending: true })
-
       if (error) throw error
 
       const pagesWithUrls = data.map(page => {
-        const { data: urlData } = supabase
-          .storage
+        const { data: urlData } = supabase.storage
           .from('picture-books')
           .getPublicUrl(page.image_path)
         return { ...page, imageUrl: urlData.publicUrl }
       })
-
       setPages(pagesWithUrls)
     } catch (err) {
       setError(err.message)
@@ -51,103 +50,117 @@ export default function BookViewer({ bookId }) {
     }
   }
 
-  // Calculate total sheets needed
-  // If we have N pages.
-  // We need Math.ceil(N / 2) + 1 (for cover/back)?
-  // Let's simplify:
-  // We render ALL sheets stacked.
-  // The 'flipping' is controlled by classes.
-  // Page i (0-indexed logic for sheets):
-  //   Front Image: pages[2*i]
-  //   Back Image: pages[2*i+1]
-  
-  const totalSheets = Math.ceil(pages.length / 2)
+  // ページ遷移の共通処理
+  const changePage = useCallback((nextIndex, dir) => {
+    if (animating) return
+    setDirection(dir)
+    setAnimating(true)
+    if (animTimerRef.current) clearTimeout(animTimerRef.current)
+    animTimerRef.current = setTimeout(() => {
+      setCurrentPage(nextIndex)
+      // ページ変更後の次フレームでアニメフラグを解除
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setAnimating(false)
+        })
+      })
+    }, 280)
+  }, [animating])
 
-  const nextPage = () => {
-    if (currentSheetIndex < totalSheets) {
-      setCurrentSheetIndex(prev => prev + 1)
+  const goNext = useCallback(() => {
+    if (currentPage >= pages.length - 1) return
+    changePage(currentPage + 1, 'next')
+  }, [animating, currentPage, pages.length, changePage])
+
+  const goPrev = useCallback(() => {
+    if (currentPage <= 0) return
+    changePage(currentPage - 1, 'prev')
+  }, [animating, currentPage, changePage])
+
+  const goToPage = useCallback((i) => {
+    if (i === currentPage) return
+    changePage(i, i > currentPage ? 'next' : 'prev')
+  }, [animating, currentPage, changePage])
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'ArrowRight') goNext()
+      if (e.key === 'ArrowLeft') goPrev()
     }
-  }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [goNext, goPrev])
 
-  const prevPage = () => {
-    if (currentSheetIndex > 0) {
-      setCurrentSheetIndex(prev => prev - 1)
-    }
-  }
+  useEffect(() => {
+    return () => { if (animTimerRef.current) clearTimeout(animTimerRef.current) }
+  }, [])
 
-  if (loading) return <div className='book-viewer-loading'><div className='loading-spinner'></div></div>
-  if (error) return <div className='book-viewer-error'>{error}</div>
-  if (pages.length === 0) return <div className='book-viewer-empty'>ページがありません</div>
+  if (loading) return (
+    <div className="bv-loading">
+      <div className="bv-spinner" />
+      <p>よみこみ中...</p>
+    </div>
+  )
+  if (error) return <div className="bv-error">{error}</div>
+  if (pages.length === 0) return <div className="bv-empty">ページがありません</div>
+
+  const page = pages[currentPage]
 
   return (
-    <div className='book-viewer'>
-      <div className='book-wrapper'>
-        {/* Render sheets in reverse order so first is on top (z-index handled by index) */}
-        {Array.from({ length: totalSheets }).map((_, i) => {
-          // Sheet i
-          // If CurrentSheet > i, this sheet is flipped (on the left side)
-          // If CurrentSheet <= i, this sheet is not flipped (on the right side)
-          // Z-Index:
-          //   Right side: Higher index is lower (0 is top).
-          //   Left side: Higher index is higher (0 is bottom).
-          // Logic:
-          //   i < currentSheetIndex: Flipped (Left). zIndex = i
-          //   i >= currentSheetIndex: Open (Right). zIndex = totalSheets - i
+    <div className="bv-container">
+      {book && <h2 className="bv-title">{book.title}</h2>}
 
-          const isFlipped = i < currentSheetIndex
-          const zIndex = isFlipped ? i : totalSheets - i
+      <div className="bv-book-area">
+        <button
+          className="bv-nav-btn bv-nav-prev"
+          onClick={goPrev}
+          disabled={currentPage === 0 || animating}
+          aria-label="前のページ"
+        >
+          ‹
+        </button>
 
-          const frontPage = pages[2 * i]
-          const backPage = pages[2 * i + 1]
+        <div className="bv-page-wrapper">
+          <div className="bv-book-shadow" />
+          <div
+            key={currentPage}
+            className={`bv-page ${animating ? (direction === 'next' ? 'bv-slide-out-left' : 'bv-slide-out-right') : 'bv-slide-in'}`}
+          >
+            <img
+              src={page.imageUrl}
+              alt={`ページ ${currentPage + 1}`}
+              className="bv-page-img"
+              draggable={false}
+            />
+            <div className="bv-page-curl" />
+          </div>
+        </div>
 
-          return (
-            <div
-              key={i}
-              className={`book-page-sheet ${isFlipped ? 'flipped' : ''}`}
-              style={{ zIndex }}
-              onClick={() => {
-                if (isFlipped) prevPage()
-                else nextPage()
-              }}
-            >
-              {/* Front of the sheet (Right Page) */}
-              <div className='page-front'>
-                {frontPage ? (
-                  <>
-                    <img src={frontPage.imageUrl} alt={`Page ${2*i+1}`} className='page-image' />
-                    <div className='page-number'>{2*i + 1}</div>
-                  </>
-                ) : (
-                  <div className='page-empty'></div>
-                )}
-              </div>
-
-              {/* Back of the sheet (Left Page) */}
-              <div className='page-back'>
-                {backPage ? (
-                  <>
-                    <img src={backPage.imageUrl} alt={`Page ${2*i+2}`} className='page-image' />
-                    <div className='page-number'>{2*i + 2}</div>
-                  </>
-                ) : (
-                  <div className='page-empty'></div>
-                )}
-              </div>
-            </div>
-          )
-        })}
+        <button
+          className="bv-nav-btn bv-nav-next"
+          onClick={goNext}
+          disabled={currentPage >= pages.length - 1 || animating}
+          aria-label="次のページ"
+        >
+          ›
+        </button>
       </div>
 
-      <div className='book-controls'>
-        <button className='btn btn-control' onClick={prevPage} disabled={currentSheetIndex === 0}>
-          ← 前へ
-        </button>
-        <div className='page-indicator'>
-          {currentSheetIndex} / {totalSheets}
-        </div>
-        <button className='btn btn-control' onClick={nextPage} disabled={currentSheetIndex === totalSheets}>
-          次へ →
-        </button>
+      <div className="bv-dots">
+        {pages.map((_, i) => (
+          <button
+            key={i}
+            className={`bv-dot ${i === currentPage ? 'bv-dot-active' : ''}`}
+            onClick={() => goToPage(i)}
+            aria-label={`${i + 1}ページ目`}
+          />
+        ))}
+      </div>
+
+      <div className="bv-counter">
+        <span className="bv-counter-current">{currentPage + 1}</span>
+        <span className="bv-counter-sep">/</span>
+        <span className="bv-counter-total">{pages.length}</span>
       </div>
     </div>
   )
