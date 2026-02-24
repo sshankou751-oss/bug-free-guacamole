@@ -17,9 +17,9 @@ const sortFilesByName = (files) => {
   })
 }
 
-export default function CreateBook({ onCancel, onComplete }) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+export default function CreateBook({ onCancel, onComplete, initialData }) {
+  const [title, setTitle] = useState(initialData?.title || '')
+  const [description, setDescription] = useState(initialData?.description || '')
   const [pages, setPages] = useState([]) // { file, preview, id }
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
