@@ -55,12 +55,6 @@ export default function EhonForest({ onSelectBook }) {
                <h2 className="text-3xl font-black text-[#2d4a22]">みずみずしい絵本の世界へ</h2>
             </div>
           </div>
-          
-          <p className="text-2xl font-bold leading-relaxed max-w-2xl mx-auto text-[#4a6b3d]">
-            青りんごのような、フレッシュでキラキラした<br />
-            すてきな物語がここにあるよ。
-          </p>
-          
           <div className="mt-12 flex justify-center">
             <div className="px-10 py-4 bg-[#2d4a22] rounded-full text-[#ccff00] font-black text-xl shadow-[0_8px_0_#1a2e14] transform transition-all hover:translate-y-1 hover:shadow-[0_2px_0_#1a2e14]">
               {books.length} さつの フレッシュな作品
