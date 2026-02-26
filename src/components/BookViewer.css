@@ -127,7 +127,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0;
   opacity: 0;
   transform: translateX(60px) scale(0.95);
   transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
@@ -166,7 +166,7 @@
 .ebv-page-img {
   display: block;
   max-width: 100%;
-  max-height: calc(100vh - 100px);
+  max-height: 100%;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -259,12 +259,16 @@
   justify-content: center;
   gap: 1.5rem;
   text-align: center;
-  padding: 2rem;
+  padding: 1rem;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ebv-cover-img {
   max-width: 90%;
-  max-height: 60vh;
+  flex: 1 1 auto;
+  min-height: 0;
   object-fit: contain;
 }
 
@@ -346,11 +350,12 @@
 @media (max-width: 600px) {
   .ebv-nav-arrow { width: 44px; height: 44px; font-size: 1.4rem; }
   .ebv-click-prev, .ebv-click-next { width: 15%; padding: 0 0.5rem; }
-  .ebv-page-frame { padding: 0 0.5rem; }
-  .ebv-page-img { max-height: calc(100vh - 100px); }
+  .ebv-page-frame { padding: 0; }
+  .ebv-page-img { max-height: 100%; }
   .ebv-topbar { padding: 0.4rem 0.6rem; }
   .ebv-topbar-title { font-size: 0.9rem; }
   .ebv-thumb { width: 40px; height: 32px; }
-  .ebv-cover-img { max-width: 95%; max-height: 55vh; }
-  .ebv-cover-title { font-size: 1.8rem; }
+  .ebv-cover-img { max-width: 95%; }
+  .ebv-cover-title { font-size: 1.5rem; }
+  .ebv-cover { gap: 1rem; padding: 1rem 0.5rem; }
 }
