@@ -2,15 +2,18 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import './BookViewer.css'
 
-export default function BookViewer({ bookId }) {
+export default function BookViewer({ bookId, onClose }) {
   const [book, setBook] = useState(null)
   const [pages, setPages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [currentPage, setCurrentPage] = useState(0)
+  // currentPage: -1 = cover, 0..n = actual pages
+  const [currentPage, setCurrentPage] = useState(-1)
+  const [prevPage, setPrevPage] = useState(null)
   const [direction, setDirection] = useState('next')
-  const [animating, setAnimating] = useState(false)
-  const animTimerRef = useRef(null)
+  const [showHint, setShowHint] = useState(true)
+  const touchStartX = useRef(0)
+  const thumbStripRef = useRef(null)
 
   useEffect(() => {
     fetchBook()
@@ -50,117 +53,164 @@ export default function BookViewer({ bookId }) {
     }
   }
 
-  // ページ遷移の共通処理
-  const changePage = useCallback((nextIndex, dir) => {
-    if (animating) return
-    setDirection(dir)
-    setAnimating(true)
-    if (animTimerRef.current) clearTimeout(animTimerRef.current)
-    animTimerRef.current = setTimeout(() => {
-      setCurrentPage(nextIndex)
-      // ページ変更後の次フレームでアニメフラグを解除
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setAnimating(false)
-        })
-      })
-    }, 280)
-  }, [animating])
+  const totalSlides = pages.length + 1 // cover + pages
 
-  const goNext = useCallback(() => {
-    if (currentPage >= pages.length - 1) return
-    changePage(currentPage + 1, 'next')
-  }, [animating, currentPage, pages.length, changePage])
+  const goTo = useCallback((nextIdx) => {
+    if (nextIdx < -1 || nextIdx >= pages.length) return
+    if (nextIdx === currentPage) return
+    setDirection(nextIdx > currentPage ? 'next' : 'prev')
+    setPrevPage(currentPage)
+    setCurrentPage(nextIdx)
+    setShowHint(false)
+    // scroll thumb into view
+    if (thumbStripRef.current) {
+      const thumb = thumbStripRef.current.children[nextIdx + 1]
+      if (thumb) thumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    }
+  }, [currentPage, pages.length])
 
-  const goPrev = useCallback(() => {
-    if (currentPage <= 0) return
-    changePage(currentPage - 1, 'prev')
-  }, [animating, currentPage, changePage])
+  const goNext = useCallback(() => goTo(currentPage + 1), [goTo, currentPage])
+  const goPrev = useCallback(() => goTo(currentPage - 1), [goTo, currentPage])
 
-  const goToPage = useCallback((i) => {
-    if (i === currentPage) return
-    changePage(i, i > currentPage ? 'next' : 'prev')
-  }, [animating, currentPage, changePage])
-
+  // Keyboard
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === 'ArrowRight') goNext()
-      if (e.key === 'ArrowLeft') goPrev()
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext() }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev() }
+      if (e.key === 'Escape' && onClose) onClose()
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [goNext, goPrev])
+  }, [goNext, goPrev, onClose])
 
-  useEffect(() => {
-    return () => { if (animTimerRef.current) clearTimeout(animTimerRef.current) }
-  }, [])
+  // Touch / swipe
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
+  const handleTouchEnd = (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goNext()
+      else goPrev()
+    }
+  }
+
+  // Progress bar click
+  const handleProgressClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const ratio = (e.clientX - rect.left) / rect.width
+    const targetIdx = Math.round(ratio * pages.length) - 1
+    goTo(Math.max(-1, Math.min(targetIdx, pages.length - 1)))
+  }
+
+  // Slide class for a given index
+  const slideClass = (idx) => {
+    if (idx === currentPage) return 'ebv-slide ebv-active'
+    if (idx === prevPage) return `ebv-slide ${direction === 'next' ? 'ebv-exit-left' : 'ebv-exit-right'}`
+    return 'ebv-slide'
+  }
 
   if (loading) return (
-    <div className="bv-loading">
-      <div className="bv-spinner" />
+    <div className="ebv-loading">
+      <div className="ebv-spinner" />
       <p>よみこみ中...</p>
     </div>
   )
-  if (error) return <div className="bv-error">{error}</div>
-  if (pages.length === 0) return <div className="bv-empty">ページがありません</div>
+  if (error) return <div className="ebv-error">{error}</div>
+  if (pages.length === 0) return <div className="ebv-empty">ページがありません</div>
 
-  const page = pages[currentPage]
+  const progressPercent = ((currentPage + 1) / pages.length) * 100
 
   return (
-    <div className="bv-container">
-      {book && <h2 className="bv-title">{book.title}</h2>}
+    <div className="ebv-container">
+      {/* Top bar */}
+      <div className="ebv-topbar">
+        <span className="ebv-topbar-title">{book?.title || ''}</span>
+        {onClose && (
+          <button className="ebv-close-btn" onClick={onClose} aria-label="閉じる">✕</button>
+        )}
+      </div>
 
-      <div className="bv-book-area">
-        <button
-          className="bv-nav-btn bv-nav-prev"
-          onClick={goPrev}
-          disabled={currentPage === 0 || animating}
-          aria-label="前のページ"
-        >
-          ‹
-        </button>
-
-        <div className="bv-page-wrapper">
-          <div className="bv-book-shadow" />
-          <div
-            key={currentPage}
-            className={`bv-page ${animating ? (direction === 'next' ? 'bv-slide-out-left' : 'bv-slide-out-right') : 'bv-slide-in'}`}
-          >
-            <img
-              src={page.imageUrl}
-              alt={`ページ ${currentPage + 1}`}
-              className="bv-page-img"
-              draggable={false}
-            />
-            <div className="bv-page-curl" />
+      {/* Stage */}
+      <div
+        className="ebv-stage"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="ebv-track">
+          {/* Cover slide (index -1) */}
+          <div className={slideClass(-1)}>
+            <div className="ebv-cover">
+              {pages[0] && (
+                <img src={pages[0].imageUrl} alt="表紙" className="ebv-cover-img" draggable={false} />
+              )}
+              <h2 className="ebv-cover-title">{book?.title}</h2>
+              {book?.description && <p className="ebv-cover-desc">{book.description}</p>}
+              <button className="ebv-cover-start" onClick={goNext}>よみはじめる →</button>
+            </div>
           </div>
+
+          {/* Page slides */}
+          {pages.map((page, i) => (
+            <div key={page.id || i} className={slideClass(i)}>
+              <div className="ebv-page-frame">
+                <img
+                  src={page.imageUrl}
+                  alt={`ページ ${i + 1}`}
+                  className="ebv-page-img"
+                  draggable={false}
+                />
+              </div>
+            </div>
+          ))}
         </div>
 
-        <button
-          className="bv-nav-btn bv-nav-next"
-          onClick={goNext}
-          disabled={currentPage >= pages.length - 1 || animating}
-          aria-label="次のページ"
+        {/* Nav click zones */}
+        <div
+          className={`ebv-click-prev ${currentPage <= -1 ? 'ebv-disabled' : ''}`}
+          onClick={goPrev}
         >
-          ›
-        </button>
+          <div className="ebv-nav-arrow">‹</div>
+        </div>
+        <div
+          className={`ebv-click-next ${currentPage >= pages.length - 1 ? 'ebv-disabled' : ''}`}
+          onClick={goNext}
+        >
+          <div className="ebv-nav-arrow">›</div>
+        </div>
+
+        {showHint && <div className="ebv-swipe-hint">← スワイプまたはクリックでページ送り →</div>}
       </div>
 
-      <div className="bv-dots">
-        {pages.map((_, i) => (
-          <button
-            key={i}
-            className={`bv-dot ${i === currentPage ? 'bv-dot-active' : ''}`}
-            onClick={() => goToPage(i)}
-            aria-label={`${i + 1}ページ目`}
-          />
-        ))}
-      </div>
+      {/* Bottom bar */}
+      <div className="ebv-bottombar">
+        {/* Progress bar */}
+        <div className="ebv-progress-track" onClick={handleProgressClick}>
+          <div className="ebv-progress-fill" style={{ width: `${Math.max(0, progressPercent)}%` }} />
+        </div>
 
-      <div className="bv-counter">
-        <span className="bv-counter-current">{currentPage + 1}</span>
-        <span className="bv-counter-sep">/</span>
-        <span className="bv-counter-total">{pages.length}</span>
+        {/* Thumbnail strip */}
+        <div className="ebv-thumbstrip" ref={thumbStripRef}>
+          {pages.map((page, i) => (
+            <div
+              key={page.id || i}
+              className={`ebv-thumb ${i === currentPage ? 'ebv-thumb-active' : ''}`}
+              onClick={() => goTo(i)}
+            >
+              <img src={page.imageUrl} alt={`${i + 1}`} draggable={false} />
+            </div>
+          ))}
+        </div>
+
+        {/* Page info */}
+        <div className="ebv-page-info">
+          {currentPage >= 0 ? (
+            <>
+              <span className="ebv-page-current">{currentPage + 1}</span>
+              <span> / {pages.length}</span>
+            </>
+          ) : (
+            <span>ひょうし</span>
+          )}
+        </div>
       </div>
     </div>
   )
