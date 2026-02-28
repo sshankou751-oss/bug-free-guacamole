@@ -1,9 +1,18 @@
-﻿import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { Book, Heart, Sprout, Bird, Star, Cloud, Sun, Apple, Sparkles } from "lucide-react"
 
 export default function EhonForest({ onSelectBook }) {
-  const [books, setBooks] = useState([])
+  const [books, setBooks] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("すべて");
+  const categories = ["すべて", "むかしばなし", "サイレントストーリー", "えほん"];
+
+  const filteredBooks = books.filter((book, index) => {
+    if (selectedCategory === "すべて") return true;
+    const cat = book.category || categories[(index % (categories.length - 1)) + 1];
+    return cat === selectedCategory;
+  });
+
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -75,7 +84,7 @@ export default function EhonForest({ onSelectBook }) {
                 <p className="mt-10 text-3xl font-black text-[#2d4a22] animate-pulse">りんごを収穫中...</p>
              </div>
           ) : books.length > 0 ? (
-            books.map((book) => (
+            filteredBooks.map((book, index) => (
               <div 
                 key={book.id} 
                 className="group cursor-pointer relative"
