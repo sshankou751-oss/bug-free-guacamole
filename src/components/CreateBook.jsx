@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import './CreateBook.css'
 
@@ -17,9 +17,12 @@ const sortFilesByName = (files) => {
   })
 }
 
+const BOOK_CATEGORIES = ['クレイえほん', 'サイレントストーリー', 'えほん']
+
 export default function CreateBook({ onCancel, onComplete, initialData }) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [description, setDescription] = useState(initialData?.description || '')
+  const [category, setCategory] = useState(initialData?.category || 'えほん')
   const [pages, setPages] = useState([]) // { file, preview, id }
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -101,7 +104,7 @@ export default function CreateBook({ onCancel, onComplete, initialData }) {
 
       const { data: book, error: bookError } = await supabase
         .from('books')
-        .insert({ title, description, user_id: user.id })
+        .insert({ title, description, category, user_id: user.id })
         .select()
         .single()
 
@@ -153,6 +156,22 @@ export default function CreateBook({ onCancel, onComplete, initialData }) {
               disabled={loading}
               required
             />
+          </div>
+
+          <div className='form-group'>
+            <label htmlFor='category' className='form-label'>カテゴリー <span className='required'>*</span></label>
+            <select
+              id='category'
+              className='form-input'
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              disabled={loading}
+              required
+            >
+              {BOOK_CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
 
           <div className='form-group'>
