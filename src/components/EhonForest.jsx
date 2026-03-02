@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react"
+﻿import React, { useState, useEffect } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { Bird, Apple, Sparkles } from "lucide-react"
 
@@ -14,10 +14,10 @@ const CATEGORY_EMOJI = {
 export default function EhonForest({ onSelectBook }) {
   const [books, setBooks] = useState([])
   const [selectedCategory, setSelectedCategory] = useState("全部")
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [dragOverCat, setDragOverCat] = useState(null)
   const [toast, setToast] = useState(null)
-  const dragBookId = useRef(null)
+  const [toastType, setToastType] = useState("ok")
 
   const filteredBooks = selectedCategory === "全部"
     ? books
@@ -25,7 +25,6 @@ export default function EhonForest({ onSelectBook }) {
 
   useEffect(() => {
     async function fetchBooks() {
-      setLoading(true)
       const { data, error } = await supabase
         .from("books")
         .select("*")
@@ -36,21 +35,19 @@ export default function EhonForest({ onSelectBook }) {
     fetchBooks()
   }, [])
 
-  const showToast = (msg) => {
+  const showToast = (msg, type = "ok") => {
     setToast(msg)
-    setTimeout(() => setToast(null), 2500)
+    setToastType(type)
+    setTimeout(() => setToast(null), 3000)
   }
 
+  // ---- Drag handlers on card ----
   const handleDragStart = (e, bookId) => {
-    dragBookId.current = bookId
+    e.dataTransfer.setData("bookId", String(bookId))
     e.dataTransfer.effectAllowed = "move"
   }
 
-  const handleDragEnd = () => {
-    dragBookId.current = null
-    setDragOverCat(null)
-  }
-
+  // ---- Drag handlers on tab ----
   const handleTabDragOver = (e, cat) => {
     if (cat === "全部") return
     e.preventDefault()
@@ -58,29 +55,48 @@ export default function EhonForest({ onSelectBook }) {
     setDragOverCat(cat)
   }
 
-  const handleTabDragLeave = () => {
-    setDragOverCat(null)
+  const handleTabDragLeave = (e) => {
+    // Only clear if truly leaving the tab (not entering a child element)
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setDragOverCat(null)
+    }
   }
 
   const handleTabDrop = async (e, cat) => {
     e.preventDefault()
     setDragOverCat(null)
-    const bookId = dragBookId.current
+
+    const bookId = e.dataTransfer.getData("bookId")
     if (!bookId || cat === "全部") return
 
-    const book = books.find(b => b.id === bookId)
-    if (!book || book.category === cat) return
+    const book = books.find(b => String(b.id) === bookId)
+    if (!book) return
+    if (book.category === cat) {
+      showToast(`すでに「${cat}」です`, "info")
+      return
+    }
 
-    // optimistic UI update
-    setBooks(prev => prev.map(b => b.id === bookId ? { ...b, category: cat } : b))
+    // Optimistic update
+    const prevBooks = books
+    setBooks(prev => prev.map(b => String(b.id) === bookId ? { ...b, category: cat } : b))
 
-    const { error } = await supabase.from("books").update({ category: cat }).eq("id", bookId)
+    const { error } = await supabase
+      .from("books")
+      .update({ category: cat })
+      .eq("id", bookId)
+
     if (error) {
-      // rollback
-      setBooks(prev => prev.map(b => b.id === bookId ? { ...b, category: book.category } : b))
-      showToast("エラーが発生しました")
+      console.error("Supabase update error:", error)
+      setBooks(prevBooks) // rollback
+      if (error.code === "42703") {
+        showToast("⚠️ DBにcategoryカラムがありません。Supabaseで追加してください", "error")
+      } else if (error.code === "42501") {
+        showToast("⚠️ 権限エラー。ログインが必要です", "error")
+      } else {
+        showToast(`⚠️ エラー: ${error.message}`, "error")
+      }
     } else {
-      showToast(`「${book.title}」を「${cat}」に移動しました！`)
+      showToast(`✅ 「${book.title}」→「${cat}」に移動しました！`)
     }
   }
 
@@ -96,8 +112,16 @@ export default function EhonForest({ onSelectBook }) {
 
       {/* Toast notification */}
       {toast && (
-        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-[#2d4a22] text-[#ccff00] font-black text-xl px-10 py-5 rounded-full shadow-2xl border-4 border-[#ccff00] animate-in fade-in slide-in-from-top-4 duration-300">
-          ✅ {toast}
+        <div
+          className={`fixed top-8 left-1/2 -translate-x-1/2 z-[100] font-black text-xl px-10 py-5 rounded-full shadow-2xl border-4 transition-all
+            ${toastType === "error"
+              ? "bg-red-600 text-white border-red-800"
+              : toastType === "info"
+              ? "bg-white text-[#2d4a22] border-[#ccff00]"
+              : "bg-[#2d4a22] text-[#ccff00] border-[#ccff00]"
+            }`}
+        >
+          {toast}
         </div>
       )}
 
@@ -134,10 +158,10 @@ export default function EhonForest({ onSelectBook }) {
         </div>
       </header>
 
-      {/* Category Tabs (also drop targets) */}
+      {/* Category Tabs */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 mb-6">
         <p className="text-center text-[#4a6b3d] font-black text-lg mb-5 opacity-70">
-          📚 本カードをカテゴリーにドラッグして振り分けよう！
+          📚 本カードをカテゴリーにドラッグ＆ドロップして振り分けよう！
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {CATEGORIES.map((cat) => {
@@ -148,15 +172,15 @@ export default function EhonForest({ onSelectBook }) {
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 onDragOver={(e) => handleTabDragOver(e, cat)}
-                onDragLeave={handleTabDragLeave}
+                onDragLeave={(e) => handleTabDragLeave(e)}
                 onDrop={(e) => handleTabDrop(e, cat)}
+                aria-label={cat}
                 className={`flex items-center gap-2 px-8 py-4 rounded-full border-4 font-black text-xl transition-all duration-200 shadow-md
-                  ${cat === "全部" ? "opacity-60 cursor-default" : ""}
                   ${isDragTarget
-                    ? "bg-[#ccff00] text-[#2d4a22] border-[#2d4a22] scale-110 shadow-[0_0_30px_rgba(204,255,0,0.8)] ring-4 ring-[#2d4a22]"
+                    ? "bg-[#ccff00] text-[#2d4a22] border-[#2d4a22] scale-110 shadow-[0_0_30px_rgba(204,255,0,0.9)] ring-4 ring-[#2d4a22]"
                     : isActive
                       ? "bg-[#2d4a22] text-[#ccff00] border-[#2d4a22] shadow-[0_6px_0_#1a2e14] scale-105"
-                      : "bg-white text-[#2d4a22] border-[#ccff00] hover:bg-[#f0ffcc] hover:scale-105 active:translate-y-1"
+                      : "bg-white text-[#2d4a22] border-[#ccff00] hover:bg-[#f0ffcc] hover:scale-105"
                   }`}
               >
                 <span className="text-2xl">{CATEGORY_EMOJI[cat]}</span>
@@ -190,18 +214,19 @@ export default function EhonForest({ onSelectBook }) {
             filteredBooks.map((book) => (
               <div
                 key={book.id}
-                draggable
+                draggable="true"
                 onDragStart={(e) => handleDragStart(e, book.id)}
-                onDragEnd={handleDragEnd}
                 className="group cursor-grab active:cursor-grabbing relative select-none"
-                onClick={() => onSelectBook(book.id)}
               >
-                <div className="absolute -inset-4 bg-[#ccff00] rounded-[4rem] opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500"></div>
-                {/* Drag hint */}
-                <div className="absolute top-3 right-3 z-20 bg-[#ccff00] text-[#2d4a22] text-xs font-black rounded-full px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity shadow">
+                {/* Glow effect */}
+                <div className="absolute -inset-4 bg-[#ccff00] rounded-[4rem] opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500 pointer-events-none"></div>
+                {/* Drag hint badge */}
+                <div className="absolute top-3 right-3 z-20 bg-[#ccff00] text-[#2d4a22] text-xs font-black rounded-full px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity shadow pointer-events-none">
                   ✋ ドラッグ
                 </div>
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-[4rem] border-[6px] border-[#ccff00] p-10 h-full transition-all duration-500 group-hover:-translate-y-4 group-hover:rotate-1 shadow-[0_20px_50px_rgba(204,255,0,0.1)] group-hover:shadow-[0_40px_80px_rgba(204,255,0,0.2)]">
+                <div
+                  className="relative bg-white/90 backdrop-blur-sm rounded-[4rem] border-[6px] border-[#ccff00] p-10 h-full transition-all duration-500 group-hover:-translate-y-4 group-hover:rotate-1 shadow-[0_20px_50px_rgba(204,255,0,0.1)] group-hover:shadow-[0_40px_80px_rgba(204,255,0,0.2)]"
+                >
                   <div className="flex flex-col h-full items-center text-center">
                     <div className="w-28 h-28 bg-[#f0ffcc] rounded-[2.5rem] flex items-center justify-center mb-8 relative">
                       <Apple className="w-14 h-14 text-[#99cc00] group-hover:scale-110 transition-transform" />
@@ -234,7 +259,7 @@ export default function EhonForest({ onSelectBook }) {
 
                     <button
                       className="mt-auto w-full py-5 bg-[#ccff00] text-[#2d4a22] font-black text-2xl rounded-[2rem] shadow-[0_10px_0_#99cc00] group-hover:shadow-[0_4px_0_#99cc00] group-hover:translate-y-1 transition-all"
-                      onClick={(e) => { e.stopPropagation(); onSelectBook(book.id) }}
+                      onClick={() => onSelectBook(book.id)}
                     >
                       ひらく！
                     </button>
@@ -248,7 +273,8 @@ export default function EhonForest({ onSelectBook }) {
                 <Apple className="w-16 h-16 text-[#99cc00]" />
               </div>
               <h3 className="text-5xl font-black mb-6 text-[#2d4a22]">
-                {selectedCategory === "全部" ? "まだりんごがなっていないよ" : `「${selectedCategory}」はまだないよ`}
+                {selectedCategory === "全部" ? "まだりんごがなっていないよ"
+                  : `「${selectedCategory}」はまだないよ`}
               </h3>
               <p className="text-2xl font-bold text-[#4a6b3d] mb-12">きみの物語で、この森をいっぱいにしよう！</p>
               <div className="w-2 h-40 bg-gradient-to-b from-[#ccff00] to-transparent mx-auto rounded-full"></div>
