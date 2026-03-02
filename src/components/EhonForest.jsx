@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react"
+﻿import React, { useState, useEffect, useRef } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { Bird, Apple, Sparkles } from "lucide-react"
 
@@ -14,7 +14,10 @@ const CATEGORY_EMOJI = {
 export default function EhonForest({ onSelectBook }) {
   const [books, setBooks] = useState([])
   const [selectedCategory, setSelectedCategory] = useState("全部")
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [dragOverCat, setDragOverCat] = useState(null)
+  const [toast, setToast] = useState(null)
+  const dragBookId = useRef(null)
 
   const filteredBooks = selectedCategory === "全部"
     ? books
@@ -22,6 +25,7 @@ export default function EhonForest({ onSelectBook }) {
 
   useEffect(() => {
     async function fetchBooks() {
+      setLoading(true)
       const { data, error } = await supabase
         .from("books")
         .select("*")
@@ -32,8 +36,57 @@ export default function EhonForest({ onSelectBook }) {
     fetchBooks()
   }, [])
 
+  const showToast = (msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2500)
+  }
+
+  const handleDragStart = (e, bookId) => {
+    dragBookId.current = bookId
+    e.dataTransfer.effectAllowed = "move"
+  }
+
+  const handleDragEnd = () => {
+    dragBookId.current = null
+    setDragOverCat(null)
+  }
+
+  const handleTabDragOver = (e, cat) => {
+    if (cat === "全部") return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+    setDragOverCat(cat)
+  }
+
+  const handleTabDragLeave = () => {
+    setDragOverCat(null)
+  }
+
+  const handleTabDrop = async (e, cat) => {
+    e.preventDefault()
+    setDragOverCat(null)
+    const bookId = dragBookId.current
+    if (!bookId || cat === "全部") return
+
+    const book = books.find(b => b.id === bookId)
+    if (!book || book.category === cat) return
+
+    // optimistic UI update
+    setBooks(prev => prev.map(b => b.id === bookId ? { ...b, category: cat } : b))
+
+    const { error } = await supabase.from("books").update({ category: cat }).eq("id", bookId)
+    if (error) {
+      // rollback
+      setBooks(prev => prev.map(b => b.id === bookId ? { ...b, category: book.category } : b))
+      showToast("エラーが発生しました")
+    } else {
+      showToast(`「${book.title}」を「${cat}」に移動しました！`)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f7fff0] text-[#2d4a22] font-sans overflow-x-hidden relative">
+      {/* Background decoration */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-30">
         <div className="absolute top-10 left-[5%] w-64 h-64 bg-[#ccff00] rounded-full blur-[100px]"></div>
         <div className="absolute top-[30%] right-[10%] w-80 h-80 bg-[#a3ff33] rounded-full blur-[120px]"></div>
@@ -41,6 +94,14 @@ export default function EhonForest({ onSelectBook }) {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white rounded-full blur-[160px]"></div>
       </div>
 
+      {/* Toast notification */}
+      {toast && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-[#2d4a22] text-[#ccff00] font-black text-xl px-10 py-5 rounded-full shadow-2xl border-4 border-[#ccff00] animate-in fade-in slide-in-from-top-4 duration-300">
+          ✅ {toast}
+        </div>
+      )}
+
+      {/* Hero Section */}
       <header className="relative pt-24 pb-16 px-6 text-center">
         <div className="relative z-10 max-w-4xl mx-auto">
           <div className="flex justify-center mb-8 gap-6">
@@ -73,18 +134,29 @@ export default function EhonForest({ onSelectBook }) {
         </div>
       </header>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 mb-12">
+      {/* Category Tabs (also drop targets) */}
+      <div className="relative z-10 max-w-4xl mx-auto px-6 mb-6">
+        <p className="text-center text-[#4a6b3d] font-black text-lg mb-5 opacity-70">
+          📚 本カードをカテゴリーにドラッグして振り分けよう！
+        </p>
         <div className="flex flex-wrap justify-center gap-4">
           {CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat
+            const isDragTarget = dragOverCat === cat
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
+                onDragOver={(e) => handleTabDragOver(e, cat)}
+                onDragLeave={handleTabDragLeave}
+                onDrop={(e) => handleTabDrop(e, cat)}
                 className={`flex items-center gap-2 px-8 py-4 rounded-full border-4 font-black text-xl transition-all duration-200 shadow-md
-                  ${isActive
-                    ? "bg-[#2d4a22] text-[#ccff00] border-[#2d4a22] shadow-[0_6px_0_#1a2e14] scale-105"
-                    : "bg-white text-[#2d4a22] border-[#ccff00] hover:bg-[#f0ffcc] hover:scale-105 active:translate-y-1"
+                  ${cat === "全部" ? "opacity-60 cursor-default" : ""}
+                  ${isDragTarget
+                    ? "bg-[#ccff00] text-[#2d4a22] border-[#2d4a22] scale-110 shadow-[0_0_30px_rgba(204,255,0,0.8)] ring-4 ring-[#2d4a22]"
+                    : isActive
+                      ? "bg-[#2d4a22] text-[#ccff00] border-[#2d4a22] shadow-[0_6px_0_#1a2e14] scale-105"
+                      : "bg-white text-[#2d4a22] border-[#ccff00] hover:bg-[#f0ffcc] hover:scale-105 active:translate-y-1"
                   }`}
               >
                 <span className="text-2xl">{CATEGORY_EMOJI[cat]}</span>
@@ -94,12 +166,16 @@ export default function EhonForest({ onSelectBook }) {
                     {filteredBooks.length}
                   </span>
                 )}
+                {isDragTarget && (
+                  <span className="ml-1 animate-bounce text-2xl">⬇️</span>
+                )}
               </button>
             )
           })}
         </div>
       </div>
 
+      {/* Gallery Section */}
       <main className="max-w-7xl mx-auto px-8 py-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-16">
           {loading ? (
@@ -114,10 +190,17 @@ export default function EhonForest({ onSelectBook }) {
             filteredBooks.map((book) => (
               <div
                 key={book.id}
-                className="group cursor-pointer relative"
+                draggable
+                onDragStart={(e) => handleDragStart(e, book.id)}
+                onDragEnd={handleDragEnd}
+                className="group cursor-grab active:cursor-grabbing relative select-none"
                 onClick={() => onSelectBook(book.id)}
               >
                 <div className="absolute -inset-4 bg-[#ccff00] rounded-[4rem] opacity-0 group-hover:opacity-10 blur-2xl transition-opacity duration-500"></div>
+                {/* Drag hint */}
+                <div className="absolute top-3 right-3 z-20 bg-[#ccff00] text-[#2d4a22] text-xs font-black rounded-full px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity shadow">
+                  ✋ ドラッグ
+                </div>
                 <div className="relative bg-white/90 backdrop-blur-sm rounded-[4rem] border-[6px] border-[#ccff00] p-10 h-full transition-all duration-500 group-hover:-translate-y-4 group-hover:rotate-1 shadow-[0_20px_50px_rgba(204,255,0,0.1)] group-hover:shadow-[0_40px_80px_rgba(204,255,0,0.2)]">
                   <div className="flex flex-col h-full items-center text-center">
                     <div className="w-28 h-28 bg-[#f0ffcc] rounded-[2.5rem] flex items-center justify-center mb-8 relative">
@@ -127,9 +210,13 @@ export default function EhonForest({ onSelectBook }) {
                       </div>
                     </div>
 
-                    {book.category && (
+                    {book.category ? (
                       <span className="mb-4 px-5 py-2 bg-[#f0ffcc] text-[#2d4a22] text-base font-black rounded-full border-2 border-[#ccff00]">
                         {CATEGORY_EMOJI[book.category] || "📚"} {book.category}
+                      </span>
+                    ) : (
+                      <span className="mb-4 px-5 py-2 bg-gray-100 text-gray-400 text-base font-black rounded-full border-2 border-gray-200">
+                        未分類
                       </span>
                     )}
 
@@ -145,7 +232,10 @@ export default function EhonForest({ onSelectBook }) {
                       </span>
                     </div>
 
-                    <button className="mt-auto w-full py-5 bg-[#ccff00] text-[#2d4a22] font-black text-2xl rounded-[2rem] shadow-[0_10px_0_#99cc00] group-hover:shadow-[0_4px_0_#99cc00] group-hover:translate-y-1 transition-all">
+                    <button
+                      className="mt-auto w-full py-5 bg-[#ccff00] text-[#2d4a22] font-black text-2xl rounded-[2rem] shadow-[0_10px_0_#99cc00] group-hover:shadow-[0_4px_0_#99cc00] group-hover:translate-y-1 transition-all"
+                      onClick={(e) => { e.stopPropagation(); onSelectBook(book.id) }}
+                    >
                       ひらく！
                     </button>
                   </div>
@@ -167,6 +257,7 @@ export default function EhonForest({ onSelectBook }) {
         </div>
       </main>
 
+      {/* Footer */}
       <footer className="py-32 text-center mt-32 relative overflow-hidden bg-white/60 backdrop-blur-md border-t-8 border-[#ccff00]">
         <div className="flex justify-center gap-12 mb-12 relative z-10">
           <Apple className="text-[#99cc00] w-16 h-16 animate-pulse" />
