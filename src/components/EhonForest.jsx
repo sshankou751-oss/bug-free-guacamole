@@ -2,7 +2,7 @@
 import { supabase } from "../lib/supabaseClient"
 import { Bird, Apple, Sparkles } from "lucide-react"
 
-const CATEGORIES = ["全部", "クレイえほん", "サイレントストーリー", "えほん"]
+const CATEGORIES = ["全部", "クレイえほん", "サイレントストーリー", "えほん", "シリーズ絵本"]
 
 const CATEGORY_EMOJI = {
   "全部": "🌿",

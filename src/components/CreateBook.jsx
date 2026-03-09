@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+﻿import { useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import './CreateBook.css'
 
@@ -17,7 +17,7 @@ const sortFilesByName = (files) => {
   })
 }
 
-const BOOK_CATEGORIES = ['クレイえほん', 'サイレントストーリー', 'えほん']
+const BOOK_CATEGORIES = ['クレイえほん', 'サイレントストーリー', 'えほん', 'シリーズ絵本']
 
 export default function CreateBook({ onCancel, onComplete, initialData }) {
   const [title, setTitle] = useState(initialData?.title || '')

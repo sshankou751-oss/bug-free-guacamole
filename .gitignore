@@ -28,3 +28,7 @@ dist-ssr
 .env.local
 .env.production
 .vercel
+
+# ローカル開発専用ファイル（GitHubに上げない）
+dev-login.html
+start-editor.bat
