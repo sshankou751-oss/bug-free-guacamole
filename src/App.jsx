@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { supabase } from "./lib/supabaseClient"
 import Auth from "./components/Auth"
 import EhonForest from "./components/EhonForest"
@@ -6,7 +6,7 @@ import BookViewer from "./components/BookViewer"
 import CreateBook from "./components/CreateBook"
 import CuteButton from "./components/CuteButton"
 import MyBooks from "./components/MyBooks"
-import { Apple } from "lucide-react"
+import { LogOut, Apple, Plus, Star, LogIn } from "lucide-react"
 import "./App.css"
 
 function App() {
@@ -28,6 +28,12 @@ function App() {
     })
     return () => subscription.unsubscribe()
   }, [])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setViewState("list")
+    setSelectedBookId(null)
+  }
 
   const handleSelectBook = (bookId) => {
     setSelectedBookId(bookId)
@@ -80,10 +86,34 @@ function App() {
               </div>
 
               <div className="header-actions flex items-center gap-6">
+                {viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
+                  <>
+                    <button onClick={handleShowMyBooks} className="hidden lg:flex items-center gap-3 px-8 py-3 bg-[#f0ffcc] text-[#2d4a22] font-black rounded-full hover:bg-[#ccff00] transition-all border-2 border-[#ccff00] shadow-md hover:shadow-lg active:translate-y-0.5">
+                      <Star className="w-5 h-5 fill-current" />
+                      きみの作品
+                    </button>
+                    <button onClick={handleStartCreating} className="flex items-center gap-3 px-10 py-4 bg-[#2d4a22] text-[#ccff00] font-black rounded-[2rem] shadow-[0_8px_0_#1a2e14] hover:shadow-[0_4px_0_#1a2e14] hover:translate-y-1 active:translate-y-2 transition-all text-lg">
+                      <Plus className="w-6 h-6 stroke-[5px]" />
+                      つくる
+                    </button>
+                  </>
+                )}
                 {(viewState === "create" || viewState === "mybooks" || viewState === "auth") && (
                   <button onClick={handleBackToList} className="px-10 py-3 bg-white text-[#2d4a22] font-black rounded-full border-[6px] border-[#ccff00] hover:bg-[#f7fff0] transition-colors shadow-lg active:translate-y-1">
                     もどる
                   </button>
+                )}
+                {session ? (
+                  <button onClick={handleSignOut} className="p-3 text-[#2d4a22] opacity-30 hover:opacity-100 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all" title="ログアウト">
+                    <LogOut className="w-7 h-7" />
+                  </button>
+                ) : (
+                  viewState !== "auth" && (
+                    <button onClick={() => setViewState("auth")} className="flex items-center gap-2 px-6 py-2 bg-[#ccff00] text-[#2d4a22] font-black rounded-full hover:bg-[#2d4a22] hover:text-[#ccff00] transition-all shadow-md active:translate-y-0.5">
+                      <LogIn className="w-5 h-5" />
+                      ログイン
+                    </button>
+                  )
                 )}
               </div>
             </div>
