@@ -107,13 +107,6 @@ function App() {
                   <button onClick={handleSignOut} className="p-3 text-[#2d4a22] opacity-30 hover:opacity-100 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all" title="ログアウト">
                     <LogOut className="w-7 h-7" />
                   </button>
-                ) : (
-                  viewState !== "auth" && (
-                    <button onClick={() => setViewState("auth")} className="flex items-center gap-2 px-6 py-2 bg-[#ccff00] text-[#2d4a22] font-black rounded-full hover:bg-[#2d4a22] hover:text-[#ccff00] transition-all shadow-md active:translate-y-0.5">
-                      <LogIn className="w-5 h-5" />
-                      ログイン
-                    </button>
-                  )
                 )}
               </div>
             </div>
