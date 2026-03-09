@@ -103,7 +103,7 @@ function App() {
                     もどる
                   </button>
                 )}
-                {session ? (
+                {session && (
                   <button onClick={handleSignOut} className="p-3 text-[#2d4a22] opacity-30 hover:opacity-100 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all" title="ログアウト">
                     <LogOut className="w-7 h-7" />
                   </button>
