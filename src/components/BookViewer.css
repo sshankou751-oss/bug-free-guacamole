@@ -129,7 +129,7 @@
   justify-content: center;
   padding: 0;
   opacity: 0;
-  transform: translateX(60px) scale(0.95);
+  transform: translateX(60px);
   transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   /* will-change removed: caused blurry image rendering */
@@ -137,19 +137,19 @@
 
 .ebv-slide.ebv-active {
   opacity: 1;
-  transform: translateX(0) scale(1);
+  transform: translateX(0);
   z-index: 2;
 }
 
 .ebv-slide.ebv-exit-left {
   opacity: 0;
-  transform: translateX(-60px) scale(0.95);
+  transform: translateX(-60px);
   z-index: 1;
 }
 
 .ebv-slide.ebv-exit-right {
   opacity: 0;
-  transform: translateX(60px) scale(0.95);
+  transform: translateX(60px);
   z-index: 1;
 }
 
