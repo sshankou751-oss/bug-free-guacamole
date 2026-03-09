@@ -86,7 +86,7 @@ function App() {
               </div>
 
               <div className="header-actions flex items-center gap-6">
-                {viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
+                {session && viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
                   <>
                     <button onClick={handleShowMyBooks} className="hidden lg:flex items-center gap-3 px-8 py-3 bg-[#f0ffcc] text-[#2d4a22] font-black rounded-full hover:bg-[#ccff00] transition-all border-2 border-[#ccff00] shadow-md hover:shadow-lg active:translate-y-0.5">
                       <Star className="w-5 h-5 fill-current" />
