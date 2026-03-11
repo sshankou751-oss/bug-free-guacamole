@@ -72,14 +72,14 @@ function App() {
       ) : (
         <>
           {/* ヘッダー */}
-          <header style={{position:"sticky",top:0,zIndex:50,height:58,overflow:"hidden",boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
-            <div style={{position:"relative"}}>
-              {/* バナー画像 - overflow:hiddenで高さ制御 */}
-              <div onClick={handleBackToList} style={{cursor:"pointer",lineHeight:0}}>
-                <img src="/header-banner.png" alt="絵本のもり" style={{width:"100%",height:"auto",display:"block"}} />
-              </div>
+          <header style={{position:"sticky",top:0,zIndex:50,padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
+            <div style={{position:"relative",lineHeight:0}}>
+              {/* バナー画像 */}
+              <img src="/header-banner.png" alt="絵本のもり"
+                onClick={handleBackToList}
+                style={{width:"100%",height:"80px",objectFit:"cover",objectPosition:"center",display:"block",cursor:"pointer"}} />
               {/* ボタン群：右上に重ねて表示 */}
-              <div style={{position:"absolute",top:12,right:16,display:"flex",alignItems:"center",gap:8,zIndex:1}}>
+              <div style={{position:"absolute",top:"50%",right:16,transform:"translateY(-50%)",display:"flex",alignItems:"center",gap:8,zIndex:1}}>
                 {session && viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
                   <>
                     <button onClick={handleShowMyBooks} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 14px",background:"rgba(255,255,255,0.85)",color:"#4a8c5a",fontWeight:700,borderRadius:100,border:"1.5px solid #c8e0ca",cursor:"pointer",fontSize:13,fontFamily:"inherit",backdropFilter:"blur(4px)"}}>
