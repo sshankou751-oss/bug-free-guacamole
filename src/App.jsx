@@ -77,14 +77,14 @@ function App() {
               width: 100% !important;
               height: 55px !important;
               object-fit: cover !important;
-              object-position: center center !important;
+              object-position: center 30% !important;
               display: block !important;
               cursor: pointer !important;
             }
             @media (max-width: 768px) {
               .header-banner {
                 height: 68px !important;
-                object-position: center 65% !important;
+                object-position: center 40% !important;
               }
             }
           `}</style>
