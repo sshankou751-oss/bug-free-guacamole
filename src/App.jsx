@@ -72,63 +72,35 @@ function App() {
       ) : (
         <>
           {/* ヘッダー */}
-          <header style={{
-            background:"rgba(255,255,255,0.92)",
-            backdropFilter:"blur(12px)",
-            borderBottom:"2px solid #d4e8d4",
-            padding:"12px 24px",
-            position:"sticky",
-            top:0,
-            zIndex:50,
-            boxShadow:"0 2px 12px rgba(109,170,122,0.1)"
-          }}>
-            <div style={{maxWidth:1200,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              {/* ヘッダーバナー */}
-              <div onClick={handleBackToList} style={{cursor:"pointer"}}>
-                <img src="/header-banner.png" alt="絵本のもり" style={{height:"auto",width:"min(100%,440px)",objectFit:"contain",display:"block"}} />
+          <header style={{position:"sticky",top:0,zIndex:50,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
+            <div style={{position:"relative",lineHeight:0}}>
+              {/* バナー画像：全幅 */}
+              <div onClick={handleBackToList} style={{cursor:"pointer",lineHeight:0}}>
+                <img src="/header-banner.png" alt="絵本のもり"
+                  style={{width:"100%",height:"auto",display:"block",maxHeight:110,objectFit:"cover",objectPosition:"left center"}} />
               </div>
-
-              {/* ヘッダーボタン */}
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
+              {/* ボタン群：バナー右上に重ねて表示 */}
+              <div style={{position:"absolute",top:"50%",right:16,transform:"translateY(-50%)",display:"flex",alignItems:"center",gap:8}}>
                 {session && viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
                   <>
-                    <button onClick={handleShowMyBooks} style={{
-                      display:"flex",alignItems:"center",gap:6,
-                      padding:"8px 20px",background:"#f0f9f0",color:"#4a8c5a",
-                      fontWeight:700,borderRadius:100,border:"2px solid #c8e0ca",
-                      cursor:"pointer",fontSize:14,fontFamily:"inherit"
-                    }}>
-                      <Star style={{width:16,height:16}} />
+                    <button onClick={handleShowMyBooks} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 14px",background:"rgba(255,255,255,0.85)",color:"#4a8c5a",fontWeight:700,borderRadius:100,border:"1.5px solid #c8e0ca",cursor:"pointer",fontSize:13,fontFamily:"inherit",backdropFilter:"blur(4px)"}}>
+                      <Star style={{width:14,height:14}} />
                       きみの作品
                     </button>
-                    <button onClick={handleStartCreating} style={{
-                      display:"flex",alignItems:"center",gap:6,
-                      padding:"10px 24px",
-                      background:"linear-gradient(135deg,#6daa7a,#8dc49a)",
-                      color:"white",fontWeight:700,borderRadius:100,border:"none",
-                      cursor:"pointer",fontSize:15,fontFamily:"inherit",
-                      boxShadow:"0 4px 12px rgba(109,170,122,0.35)"
-                    }}>
-                      <Plus style={{width:18,height:18}} />
+                    <button onClick={handleStartCreating} style={{display:"flex",alignItems:"center",gap:4,padding:"8px 18px",background:"linear-gradient(135deg,#6daa7a,#8dc49a)",color:"white",fontWeight:700,borderRadius:100,border:"none",cursor:"pointer",fontSize:13,fontFamily:"inherit",boxShadow:"0 3px 10px rgba(109,170,122,0.4)"}}>
+                      <Plus style={{width:15,height:15}} />
                       つくる
                     </button>
                   </>
                 )}
                 {(viewState === "create" || viewState === "mybooks" || viewState === "auth") && (
-                  <button onClick={handleBackToList} style={{
-                    padding:"10px 24px",background:"white",color:"#4a8c5a",
-                    fontWeight:700,borderRadius:100,border:"2px solid #c8e0ca",
-                    cursor:"pointer",fontFamily:"inherit"
-                  }}>
+                  <button onClick={handleBackToList} style={{padding:"7px 18px",background:"rgba(255,255,255,0.85)",color:"#4a8c5a",fontWeight:700,borderRadius:100,border:"1.5px solid #c8e0ca",cursor:"pointer",fontFamily:"inherit",backdropFilter:"blur(4px)"}}>
                     もどる
                   </button>
                 )}
                 {session && (
-                  <button onClick={handleSignOut} title="ログアウト" style={{
-                    padding:8,background:"transparent",border:"none",
-                    cursor:"pointer",color:"#aaa",borderRadius:8
-                  }}>
-                    <LogOut style={{width:22,height:22}} />
+                  <button onClick={handleSignOut} title="ログアウト" style={{padding:6,background:"rgba(255,255,255,0.7)",border:"none",cursor:"pointer",color:"#999",borderRadius:8,backdropFilter:"blur(4px)"}}>
+                    <LogOut style={{width:20,height:20}} />
                   </button>
                 )}
               </div>
