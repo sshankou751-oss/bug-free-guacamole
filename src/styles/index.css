@@ -1,8 +1,9 @@
-﻿@import "tailwindcss";
+﻿@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap');
+@import "tailwindcss";
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic Pro', 'Rounded Mplus 1c', sans-serif;
+  line-height: 1.6;
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,4 +16,3 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
-

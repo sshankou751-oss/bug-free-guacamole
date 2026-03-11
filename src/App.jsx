@@ -6,7 +6,7 @@ import BookViewer from "./components/BookViewer"
 import CreateBook from "./components/CreateBook"
 import CuteButton from "./components/CuteButton"
 import MyBooks from "./components/MyBooks"
-import { LogOut, Apple, Plus, Star, LogIn } from "lucide-react"
+import { LogOut, Plus, Star } from "lucide-react"
 import "./App.css"
 
 function App() {
@@ -59,69 +59,92 @@ function App() {
 
   if (loading) {
     return (
-      <div className="loading-container bg-[#f7fff0]">
-        <div className="relative">
-          <div className="absolute inset-0 bg-[#ccff00] rounded-full blur-xl animate-pulse"></div>
-          <div className="loading-spinner !border-[#2d4a22] !border-t-transparent !w-20 !h-20 !border-8"></div>
-        </div>
+      <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#fdf8ef"}}>
+        <div style={{width:56,height:56,border:"5px solid #d4e8d4",borderTopColor:"#6daa7a",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} />
       </div>
     )
   }
 
   return (
-    <div className="app bg-[#f7fff0] font-sans selection:bg-[#ccff00] selection:text-[#2d4a22]">
+    <div style={{minHeight:"100vh",background:"#fdf8ef",fontFamily:"'Zen Maru Gothic','Hiragino Maru Gothic Pro','Rounded Mplus 1c',sans-serif"}}>
       {viewState === "viewer" && selectedBookId ? (
         <BookViewer bookId={selectedBookId} onClose={handleBackToList} />
       ) : (
         <>
-          <header className="app-header !bg-white/90 sticky top-0 z-50 backdrop-blur-2xl border-b-8 border-[#ccff00] !shadow-2xl py-6 transition-all">
-            <div className="container px-8 flex justify-between items-center">
-              <div className="flex items-center gap-4 cursor-pointer group" onClick={handleBackToList}>
-                <div className="bg-[#ccff00] p-3 rounded-3xl group-hover:rotate-[15deg] transition-all shadow-lg border-2 border-white">
-                  <Apple className="text-[#2d4a22] w-8 h-8" />
-                </div>
-                <h1 className="text-4xl font-black tracking-tighter text-[#2d4a22]">
-                  絵本の<span className="text-[#99cc00]">もり</span>
-                </h1>
+          {/* ヘッダー */}
+          <header style={{
+            background:"rgba(255,255,255,0.92)",
+            backdropFilter:"blur(12px)",
+            borderBottom:"2px solid #d4e8d4",
+            padding:"12px 24px",
+            position:"sticky",
+            top:0,
+            zIndex:50,
+            boxShadow:"0 2px 12px rgba(109,170,122,0.1)"
+          }}>
+            <div style={{maxWidth:1200,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              {/* ロゴ */}
+              <div onClick={handleBackToList} style={{cursor:"pointer",display:"flex",alignItems:"center",gap:12}}>
+                <img src="/og-logo-v2.png" alt="絵本のもり" style={{height:48,width:"auto",objectFit:"contain"}} />
               </div>
 
-              <div className="header-actions flex items-center gap-6">
+              {/* ヘッダーボタン */}
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
                 {session && viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
                   <>
-                    <button onClick={handleShowMyBooks} className="hidden lg:flex items-center gap-3 px-8 py-3 bg-[#f0ffcc] text-[#2d4a22] font-black rounded-full hover:bg-[#ccff00] transition-all border-2 border-[#ccff00] shadow-md hover:shadow-lg active:translate-y-0.5">
-                      <Star className="w-5 h-5 fill-current" />
+                    <button onClick={handleShowMyBooks} style={{
+                      display:"flex",alignItems:"center",gap:6,
+                      padding:"8px 20px",background:"#f0f9f0",color:"#4a8c5a",
+                      fontWeight:700,borderRadius:100,border:"2px solid #c8e0ca",
+                      cursor:"pointer",fontSize:14,fontFamily:"inherit"
+                    }}>
+                      <Star style={{width:16,height:16}} />
                       きみの作品
                     </button>
-                    <button onClick={handleStartCreating} className="flex items-center gap-3 px-10 py-4 bg-[#2d4a22] text-[#ccff00] font-black rounded-[2rem] shadow-[0_8px_0_#1a2e14] hover:shadow-[0_4px_0_#1a2e14] hover:translate-y-1 active:translate-y-2 transition-all text-lg">
-                      <Plus className="w-6 h-6 stroke-[5px]" />
+                    <button onClick={handleStartCreating} style={{
+                      display:"flex",alignItems:"center",gap:6,
+                      padding:"10px 24px",
+                      background:"linear-gradient(135deg,#6daa7a,#8dc49a)",
+                      color:"white",fontWeight:700,borderRadius:100,border:"none",
+                      cursor:"pointer",fontSize:15,fontFamily:"inherit",
+                      boxShadow:"0 4px 12px rgba(109,170,122,0.35)"
+                    }}>
+                      <Plus style={{width:18,height:18}} />
                       つくる
                     </button>
                   </>
                 )}
                 {(viewState === "create" || viewState === "mybooks" || viewState === "auth") && (
-                  <button onClick={handleBackToList} className="px-10 py-3 bg-white text-[#2d4a22] font-black rounded-full border-[6px] border-[#ccff00] hover:bg-[#f7fff0] transition-colors shadow-lg active:translate-y-1">
+                  <button onClick={handleBackToList} style={{
+                    padding:"10px 24px",background:"white",color:"#4a8c5a",
+                    fontWeight:700,borderRadius:100,border:"2px solid #c8e0ca",
+                    cursor:"pointer",fontFamily:"inherit"
+                  }}>
                     もどる
                   </button>
                 )}
                 {session && (
-                  <button onClick={handleSignOut} className="p-3 text-[#2d4a22] opacity-30 hover:opacity-100 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all" title="ログアウト">
-                    <LogOut className="w-7 h-7" />
+                  <button onClick={handleSignOut} title="ログアウト" style={{
+                    padding:8,background:"transparent",border:"none",
+                    cursor:"pointer",color:"#aaa",borderRadius:8
+                  }}>
+                    <LogOut style={{width:22,height:22}} />
                   </button>
                 )}
               </div>
             </div>
           </header>
 
-          <main className="app-main min-h-[calc(100vh-120px)]">
+          <main>
             {viewState === "create" ? (
-              <div className="container py-20 px-8">
-                <div className="bg-white/80 backdrop-blur-xl rounded-[4rem] border-8 border-[#ccff00] p-12 shadow-[0_40px_100px_rgba(204,255,0,0.15)] animate-in fade-in zoom-in duration-500">
+              <div style={{maxWidth:860,margin:"0 auto",padding:"40px 24px"}}>
+                <div style={{background:"white",borderRadius:40,border:"2px solid #d4e8d4",padding:48,boxShadow:"0 8px 40px rgba(109,170,122,0.1)"}}>
                   <CreateBook onCancel={handleBackToList} onComplete={handleCreateComplete} />
                 </div>
               </div>
             ) : viewState === "mybooks" ? (
-              <div className="container py-20 px-8">
-                <div className="bg-white/80 backdrop-blur-xl rounded-[4rem] border-8 border-[#ccff00] p-12 shadow-[0_40px_100px_rgba(204,255,0,0.15)] animate-in fade-in zoom-in duration-500">
+              <div style={{maxWidth:860,margin:"0 auto",padding:"40px 24px"}}>
+                <div style={{background:"white",borderRadius:40,border:"2px solid #d4e8d4",padding:48,boxShadow:"0 8px 40px rgba(109,170,122,0.1)"}}>
                   <MyBooks onSelectBook={handleSelectBook} />
                 </div>
               </div>
