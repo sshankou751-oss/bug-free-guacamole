@@ -74,24 +74,24 @@ function App() {
           {/* ヘッダー */}
           <style>{`
             .header-banner {
-              width: 100%;
-              height: 55px;
-              object-fit: cover;
-              object-position: center center;
-              display: block;
-              cursor: pointer;
+              width: 100% !important;
+              height: 55px !important;
+              object-fit: cover !important;
+              object-position: center center !important;
+              display: block !important;
+              cursor: pointer !important;
             }
             @media (max-width: 768px) {
               .header-banner {
-                height: 68px;
-                object-position: center 65%;
+                height: 68px !important;
+                object-position: center 65% !important;
               }
             }
           `}</style>
           <header style={{position:"sticky",top:0,zIndex:50,padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
             <div style={{position:"relative",lineHeight:0}}>
               {/* バナー画像 */}
-              <img src="/header-banner.png" alt="絵本のもり"
+              <img src="/header-banner-v2.png" alt="絵本のもり"
                 onClick={handleBackToList}
                 className="header-banner" />
               {/* ボタン群：右上に重ねて表示 */}
