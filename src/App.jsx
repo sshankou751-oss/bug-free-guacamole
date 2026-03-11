@@ -72,12 +72,28 @@ function App() {
       ) : (
         <>
           {/* ヘッダー */}
+          <style>{`
+            .header-banner {
+              width: 100%;
+              height: 55px;
+              object-fit: cover;
+              object-position: center center;
+              display: block;
+              cursor: pointer;
+            }
+            @media (max-width: 768px) {
+              .header-banner {
+                height: 68px;
+                object-position: center 65%;
+              }
+            }
+          `}</style>
           <header style={{position:"sticky",top:0,zIndex:50,padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
             <div style={{position:"relative",lineHeight:0}}>
               {/* バナー画像 */}
               <img src="/header-banner.png" alt="絵本のもり"
                 onClick={handleBackToList}
-                style={{width:"100%",height:"80px",objectFit:"cover",objectPosition:"center",display:"block",cursor:"pointer"}} />
+                className="header-banner" />
               {/* ボタン群：右上に重ねて表示 */}
               <div style={{position:"absolute",top:"50%",right:16,transform:"translateY(-50%)",display:"flex",alignItems:"center",gap:8,zIndex:1}}>
                 {session && viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
