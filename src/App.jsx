@@ -83,9 +83,9 @@ function App() {
             boxShadow:"0 2px 12px rgba(109,170,122,0.1)"
           }}>
             <div style={{maxWidth:1200,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              {/* ロゴ */}
-              <div onClick={handleBackToList} style={{cursor:"pointer",display:"flex",alignItems:"center",gap:12}}>
-                <img src="/og-logo-v2.png" alt="絵本のもり" style={{height:48,width:"auto",objectFit:"contain"}} />
+              {/* ヘッダーバナー */}
+              <div onClick={handleBackToList} style={{cursor:"pointer"}}>
+                <img src="/header-banner.png" alt="絵本のもり" style={{height:56,width:"auto",maxWidth:320,objectFit:"contain",display:"block"}} />
               </div>
 
               {/* ヘッダーボタン */}
