@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabaseClient"
 
 const CATEGORIES = ["全部", "クレイえほん", "サイレントストーリー", "えほん", "シリーズ絵本"]
 const CATEGORY_EMOJI = {
-  "全部": "🍀", "クレイえほん": "🧸", "サイレントストーリー": "🌙", "えほん": "🌷", "シリーズ絵本": "🚂",
+  "全部": "🌳", "クレイえほん": "🍄", "サイレントストーリー": "🦉", "えほん": "🐰", "シリーズ絵本": "🌰",
 }
 
 export default function EhonForest({ onSelectBook }) {
