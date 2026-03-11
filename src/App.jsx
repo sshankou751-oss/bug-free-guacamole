@@ -85,7 +85,7 @@ function App() {
             <div style={{maxWidth:1200,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               {/* ヘッダーバナー */}
               <div onClick={handleBackToList} style={{cursor:"pointer"}}>
-                <img src="/header-banner.png" alt="絵本のもり" style={{height:56,width:"auto",maxWidth:320,objectFit:"contain",display:"block"}} />
+                <img src="/header-banner.png" alt="絵本のもり" style={{height:"auto",width:"min(100%,440px)",objectFit:"contain",display:"block"}} />
               </div>
 
               {/* ヘッダーボタン */}
