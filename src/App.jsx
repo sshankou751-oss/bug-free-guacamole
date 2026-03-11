@@ -81,7 +81,7 @@ function App() {
                   <Apple className="text-[#2d4a22] w-8 h-8" />
                 </div>
                 <h1 className="text-4xl font-black tracking-tighter text-[#2d4a22]">
-                  えほんの<span className="text-[#99cc00]">森</span>
+                  絵本の<span className="text-[#99cc00]">もり</span>
                 </h1>
               </div>
 

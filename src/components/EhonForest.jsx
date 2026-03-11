@@ -291,7 +291,7 @@ export default function EhonForest({ onSelectBook }) {
           <Bird className="text-[#2d4a22] w-16 h-16 opacity-20" />
         </div>
         <p className="text-6xl font-black text-[#2d4a22] tracking-tighter relative z-10">
-          えほんの<span className="text-[#99cc00]">森</span>
+          絵本の<span className="text-[#99cc00]">もり</span>
         </p>
         <p className="text-xl font-black text-[#99cc00] mt-6 tracking-[0.2em] relative z-10 uppercase"> Fresh Apple Stories </p>
         <div className="absolute top-0 left-0 w-64 h-64 bg-[#ccff00] rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl opacity-20"></div>
