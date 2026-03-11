@@ -77,7 +77,7 @@ function App() {
               {/* バナー画像：全幅 */}
               <div onClick={handleBackToList} style={{cursor:"pointer",lineHeight:0}}>
                 <img src="/header-banner.png" alt="絵本のもり"
-                  style={{width:"100%",height:72,display:"block",objectFit:"cover",objectPosition:"left center"}} />
+                  style={{height:68,width:"auto",maxWidth:"100%",display:"block"}} />
               </div>
               {/* ボタン群：バナー右上に重ねて表示 */}
               <div style={{position:"absolute",top:"50%",right:16,transform:"translateY(-50%)",display:"flex",alignItems:"center",gap:8}}>
