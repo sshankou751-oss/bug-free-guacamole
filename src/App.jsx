@@ -72,15 +72,15 @@ function App() {
       ) : (
         <>
           {/* ヘッダー */}
-          <header style={{position:"sticky",top:0,zIndex:50,background:"rgba(255,255,255,0.95)",backdropFilter:"blur(10px)",boxShadow:"0 2px 16px rgba(109,170,122,0.12)",padding:"8px 16px"}}>
-            <div style={{position:"relative",display:"flex",justifyContent:"center",alignItems:"center"}}>
-              {/* バナー画像：中央配置・適切なサイズ */}
-              <div onClick={handleBackToList} style={{cursor:"pointer",lineHeight:0}}>
+          <header style={{position:"sticky",top:0,zIndex:50,boxShadow:"0 2px 16px rgba(109,170,122,0.12)",padding:0,overflow:"hidden"}}>
+            <div style={{position:"relative",lineHeight:0}}>
+              {/* バナー画像：全幅・高さ固定88px */}
+              <div onClick={handleBackToList} style={{cursor:"pointer",lineHeight:0,display:"block"}}>
                 <img src="/header-banner.png" alt="絵本のもり"
-                  style={{height:"auto",width:"min(90vw,520px)",display:"block"}} />
+                  style={{width:"100%",height:"88px",objectFit:"cover",objectPosition:"center",display:"block"}} />
               </div>
-              {/* ボタン群：バナー右に */}
-              <div style={{position:"absolute",top:"50%",right:0,transform:"translateY(-50%)",display:"flex",alignItems:"center",gap:8}}>
+              {/* ボタン群：バナー右上に重ねて表示 */}
+              <div style={{position:"absolute",top:"50%",right:16,transform:"translateY(-50%)",display:"flex",alignItems:"center",gap:8}}>
                 {session && viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
                   <>
                     <button onClick={handleShowMyBooks} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 14px",background:"rgba(255,255,255,0.85)",color:"#4a8c5a",fontWeight:700,borderRadius:100,border:"1.5px solid #c8e0ca",cursor:"pointer",fontSize:13,fontFamily:"inherit",backdropFilter:"blur(4px)"}}>
