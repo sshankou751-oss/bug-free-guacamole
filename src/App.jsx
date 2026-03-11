@@ -91,7 +91,7 @@ function App() {
           <header style={{position:"sticky",top:0,zIndex:50,padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
             <div style={{position:"relative",lineHeight:0}}>
               {/* バナー画像 */}
-              <img src="/header-banner-v2.png" alt="絵本のもり"
+              <img src="/header-banner-v3.png" alt="絵本のもり"
                 onClick={handleBackToList}
                 className="header-banner" />
               {/* ボタン群：右上に重ねて表示 */}
