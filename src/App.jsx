@@ -75,16 +75,16 @@ function App() {
           <style>{`
             .header-banner {
               width: 100% !important;
-              height: 55px !important;
-              object-fit: cover !important;
-              object-position: center 30% !important;
+              height: 80px !important;
+              object-fit: contain !important;
+              object-position: left center !important;
               display: block !important;
               cursor: pointer !important;
             }
             @media (max-width: 768px) {
               .header-banner {
-                height: 68px !important;
-                object-position: center 40% !important;
+                height: 60px !important;
+                object-position: center center !important;
               }
             }
           `}</style>
