@@ -77,43 +77,47 @@ export default function EhonForest({ onSelectBook }) {
           </p>
 
           {books.length > 0 ? (
-            <div 
-              onClick={() => onSelectBook(books[0].id)}
-              style={{
-                display: "flex",
-                background: "white",
-                borderRadius: 24,
-                padding: "20px 24px",
-                gap: 24,
-                alignItems: "center",
-                width: "min(100%, 540px)",
-                boxShadow: "0 8px 24px rgba(109,170,122,0.15)",
-                cursor: "pointer",
-                border: "2px solid #e1eee4",
-                transition: "transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s",
-                position: "relative"
-              }}
-              onMouseEnter={(e)=>{e.currentTarget.style.transform="translateY(-6px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(109,170,122,0.2)"}}
-              onMouseLeave={(e)=>{e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 8px 24px rgba(109,170,122,0.15)"}}
-            >
-              <div style={{position:"absolute", top:-12, left:-12, background:"#ff9eaf", color:"white", fontWeight:800, fontSize:13, padding:"6px 16px", borderRadius:100, transform:"rotate(-4deg)", boxShadow:"0 4px 12px rgba(255,158,175,0.4)"}}>NEW</div>
-              <div style={{flexShrink:0, width: 88, height: 88, background: "#fdf8ef", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, boxShadow:"inset 0 2px 12px rgba(0,0,0,0.03)"}}>
-                {CATEGORY_EMOJI[books[0].category] || "📖"}
-              </div>
-              <div style={{textAlign: "left", flex: 1}}>
-                <div style={{display:"inline-block", background:"#f0f9f0", color:"#4a8c5a", padding:"4px 12px", borderRadius:100, fontSize:11, fontWeight:800, marginBottom:8}}>
-                  {books[0].category}
+            <div style={{display: "flex", overflowX: "auto", overflowY: "hidden", gap: 16, padding: "12px 12px 24px", width: "100%", scrollBehavior: "smooth", WebkitOverflowScrolling: "touch"}}>
+              {books.slice(0, 5).map((book, index) => (
+                <div 
+                  key={book.id}
+                  onClick={() => onSelectBook(book.id)}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    background: "white",
+                    borderRadius: 20,
+                    padding: "20px 20px 16px",
+                    gap: 12,
+                    alignItems: "center",
+                    flexShrink: 0,
+                    width: "min(85vw, 240px)",
+                    boxShadow: "0 8px 24px rgba(109,170,122,0.15)",
+                    cursor: "pointer",
+                    border: "2px solid #e1eee4",
+                    transition: "transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s",
+                    position: "relative"
+                  }}
+                  onMouseEnter={(e)=>{if(window.innerWidth > 768){e.currentTarget.style.transform="translateY(-6px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(109,170,122,0.2)"}}}
+                  onMouseLeave={(e)=>{if(window.innerWidth > 768){e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 8px 24px rgba(109,170,122,0.15)"}}}
+                >
+                  {index === 0 && <div style={{position:"absolute", top:-12, left:-12, background:"#ff9eaf", color:"white", fontWeight:800, fontSize:12, padding:"4px 12px", borderRadius:100, transform:"rotate(-4deg)", boxShadow:"0 4px 12px rgba(255,158,175,0.4)"}}>NEW</div>}
+                  <div style={{flexShrink:0, width: 88, height: 88, background: "#fdf8ef", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, boxShadow:"inset 0 2px 12px rgba(0,0,0,0.03)"}}>
+                    {CATEGORY_EMOJI[book.category] || "📖"}
+                  </div>
+                  <div style={{textAlign: "center", flex: 1, width: "100%"}}>
+                    <div style={{display:"inline-block", background:"#f0f9f0", color:"#4a8c5a", padding:"4px 12px", borderRadius:100, fontSize:10, fontWeight:800, marginBottom:8}}>
+                      {book.category}
+                    </div>
+                    <h3 style={{margin: "0 0 6px", fontSize: 16, color: "#3d5c46", fontWeight: 800, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden"}}>
+                      {book.title}
+                    </h3>
+                    <p style={{margin: 0, fontSize: 12, color: "#8aab94", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>
+                      さく：{book.author}
+                    </p>
+                  </div>
                 </div>
-                <h3 style={{margin: "0 0 6px", fontSize: 20, color: "#3d5c46", fontWeight: 800, lineHeight: 1.3}}>
-                  {books[0].title}
-                </h3>
-                <p style={{margin: 0, fontSize: 13, color: "#8aab94", fontWeight: 700}}>
-                  さく：{books[0].author}
-                </p>
-              </div>
-              <div style={{background:"#fdf8ef", width:36, height:36, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:"#6daa7a", flexShrink:0}}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-              </div>
+              ))}
             </div>
           ) : (
              <div style={{padding: 24, color: "#8aab94", fontWeight: 700}}>まだ絵本がありません</div>
