@@ -63,7 +63,7 @@ export default function EhonForest({ onSelectBook }) {
         </div>
       </header>
       <div style={{maxWidth:860,margin:"0 auto",padding:"0 24px 28px",position:"relative",zIndex:10}}>
-        <p style={{textAlign:"center",color:"#8aab94",fontWeight:700,fontSize:12,marginBottom:14}}>カテゴリーでさがす（ドラッグで振り分けもできます）</p>
+        <p style={{textAlign:"center",color:"#8aab94",fontWeight:700,fontSize:12,marginBottom:14}}>カテゴリーでさがす</p>
         <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:10}}>
           {CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat
