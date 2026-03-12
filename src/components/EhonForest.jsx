@@ -76,38 +76,35 @@ export default function EhonForest({ onSelectBook }) {
             絵本のもりの最新情報や、これからの予定だよ！
           </p>
 
-          <div style={{display: "flex", overflowX: "auto", overflowY: "hidden", gap: 16, padding: "12px 12px 24px", width: "100%", scrollBehavior: "smooth", WebkitOverflowScrolling: "touch"}}>
+          <div style={{display: "flex", justifyContent: "center", padding: "12px 12px 24px", width: "100%"}}>
             
-            {/* 1枚目のカード */}
-            <div style={{display: "flex", flexDirection: "column", background: "white", borderRadius: 20, padding: "20px 20px 16px", gap: 12, alignItems: "center", flexShrink: 0, width: "min(85vw, 240px)", boxShadow: "0 8px 24px rgba(109,170,122,0.15)", border: "2px solid #e1eee4", position: "relative"}}>
-              <div style={{position:"absolute", top:-12, left:-12, background:"#ff9eaf", color:"white", fontWeight:800, fontSize:12, padding:"4px 12px", borderRadius:100, transform:"rotate(-4deg)", boxShadow:"0 4px 12px rgba(255,158,175,0.4)"}}>NEW</div>
-              <div style={{flexShrink:0, width: 88, height: 88, background: "#fdf8ef", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, boxShadow:"inset 0 2px 12px rgba(0,0,0,0.03)"}}>
-                🎉
+            {/* 次回予告の動画カード（1枚のみ） */}
+            <div style={{display: "flex", flexDirection: "column", background: "white", borderRadius: 24, padding: "24px", gap: 16, alignItems: "center", width: "min(100%, 500px)", boxShadow: "0 8px 32px rgba(109,170,122,0.18)", border: "2px solid #e1eee4", position: "relative"}}>
+              <div style={{position:"absolute", top:-12, left:-12, background:"#ff9eaf", color:"white", fontWeight:800, fontSize:14, padding:"6px 16px", borderRadius:100, transform:"rotate(-4deg)", boxShadow:"0 4px 12px rgba(255,158,175,0.4)"}}>次回予告！</div>
+              
+              {/* 動画エリア */}
+              <div style={{width: "100%", borderRadius: 16, overflow: "hidden", background: "#fdf8ef", boxShadow:"inset 0 2px 12px rgba(0,0,0,0.03)", position: "relative", aspectRatio: "16/9"}}>
+                {/* 実際の動画を使う時は、publicフォルダに video.mp4 などを置き、src="/video.mp4" と指定してください */}
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline 
+                  style={{width: "100%", height: "100%", objectFit: "cover"}}
+                  src="https://cdn.pixabay.com/video/2021/08/04/83866-584711317_tiny.mp4"
+                ></video>
               </div>
-              <div style={{textAlign: "center", flex: 1, width: "100%"}}>
-                <div style={{display:"inline-block", background:"#f0f9f0", color:"#4a8c5a", padding:"4px 12px", borderRadius:100, fontSize:10, fontWeight:800, marginBottom:8}}>ニュース</div>
-                <h3 style={{margin: "0 0 6px", fontSize: 16, color: "#3d5c46", fontWeight: 800, lineHeight: 1.4}}>
-                  サイトが新しくなりました！
+              
+              <div style={{textAlign: "center", width: "100%"}}>
+                <div style={{display:"inline-block", background:"#fce8e8", color:"#d46a6a", padding:"4px 14px", borderRadius:100, fontSize:11, fontWeight:800, marginBottom:10}}>よてい</div>
+                <h3 style={{margin: "0 0 8px", fontSize: 20, color: "#3d5c46", fontWeight: 800, lineHeight: 1.4}}>
+                  新しい絵本をせいさく中！
                 </h3>
-                <p style={{margin: 0, fontSize: 12, color: "#8aab94", fontWeight: 700}}>いっぱいたのしんでね</p>
+                <p style={{margin: 0, fontSize: 14, color: "#8aab94", fontWeight: 700}}>
+                  どんなおはなしになるかな？おたのしみに✨
+                </p>
               </div>
             </div>
-
-            {/* 2枚目のカード */}
-            <div style={{display: "flex", flexDirection: "column", background: "white", borderRadius: 20, padding: "20px 20px 16px", gap: 12, alignItems: "center", flexShrink: 0, width: "min(85vw, 240px)", boxShadow: "0 8px 24px rgba(109,170,122,0.15)", border: "2px solid #e1eee4", position: "relative"}}>
-              <div style={{flexShrink:0, width: 88, height: 88, background: "#fdf8ef", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, boxShadow:"inset 0 2px 12px rgba(0,0,0,0.03)"}}>
-                🎨
-              </div>
-              <div style={{textAlign: "center", flex: 1, width: "100%"}}>
-                <div style={{display:"inline-block", background:"#fce8e8", color:"#d46a6a", padding:"4px 12px", borderRadius:100, fontSize:10, fontWeight:800, marginBottom:8}}>よてい</div>
-                <h3 style={{margin: "0 0 6px", fontSize: 16, color: "#3d5c46", fontWeight: 800, lineHeight: 1.4}}>
-                  新しい絵本を<br/>せいさく中！
-                </h3>
-                <p style={{margin: 0, fontSize: 12, color: "#8aab94", fontWeight: 700}}>おたのしみに</p>
-              </div>
-            </div>
-
-
 
           </div>
         </div>
