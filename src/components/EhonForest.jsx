@@ -55,13 +55,74 @@ export default function EhonForest({ onSelectBook }) {
           {toast}
         </div>
       )}
-      <header style={{textAlign:"center",padding:"48px 24px 28px",position:"relative",zIndex:10}}>
-        <img src="/og-logo-v2.png" alt="絵本のもり" style={{height:148,width:"auto",margin:"0 auto 14px",display:"block",filter:"drop-shadow(0 4px 12px rgba(0,0,0,0.08))"}} />
-        <p style={{color:"#6daa7a",fontWeight:700,fontSize:17,margin:"0 0 16px"}}>みずみずしい絵本の世界へようこそ 🌿</p>
-        <div style={{display:"inline-block",padding:"8px 24px",background:"rgba(255,255,255,0.8)",borderRadius:100,border:"2px solid #d4e8d4",boxShadow:"0 2px 8px rgba(0,0,0,0.05)"}}>
-          <span style={{color:"#4a8c5a",fontWeight:700,fontSize:14}}>{books.length} さつの絵本</span>
+      {/* ヒーロービジュアル（おすすめ・最新情報） */}
+      <section style={{maxWidth: 860, margin: "32px auto 40px", padding: "0 24px", position: "relative", zIndex: 10}}>
+        <div style={{
+          background: "linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6))",
+          backdropFilter: "blur(12px)",
+          borderRadius: 28,
+          padding: "36px 32px",
+          boxShadow: "0 12px 40px rgba(109, 170, 122, 0.12)",
+          border: "4px solid rgba(255,255,255,0.8)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center"
+        }}>
+          <h2 style={{fontSize: 22, fontWeight: 800, color: "#4a8c5a", margin: "0 0 8px", display:"flex", alignItems:"center", gap:8}}>
+            <span style={{fontSize:26}}>✨</span> さいしんの絵本
+          </h2>
+          <p style={{fontSize: 14, color: "#8aab94", margin: "0 0 28px", fontWeight: 700}}>
+            もりにあたらしく追加されたピカピカの絵本だよ！
+          </p>
+
+          {books.length > 0 ? (
+            <div 
+              onClick={() => onSelectBook(books[0].id)}
+              style={{
+                display: "flex",
+                background: "white",
+                borderRadius: 24,
+                padding: "20px 24px",
+                gap: 24,
+                alignItems: "center",
+                width: "min(100%, 540px)",
+                boxShadow: "0 8px 24px rgba(109,170,122,0.15)",
+                cursor: "pointer",
+                border: "2px solid #e1eee4",
+                transition: "transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s",
+                position: "relative"
+              }}
+              onMouseEnter={(e)=>{e.currentTarget.style.transform="translateY(-6px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(109,170,122,0.2)"}}
+              onMouseLeave={(e)=>{e.currentTarget.style.transform="none"; e.currentTarget.style.boxShadow="0 8px 24px rgba(109,170,122,0.15)"}}
+            >
+              <div style={{position:"absolute", top:-12, left:-12, background:"#ff9eaf", color:"white", fontWeight:800, fontSize:13, padding:"6px 16px", borderRadius:100, transform:"rotate(-4deg)", boxShadow:"0 4px 12px rgba(255,158,175,0.4)"}}>NEW</div>
+              <div style={{flexShrink:0, width: 88, height: 88, background: "#fdf8ef", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, boxShadow:"inset 0 2px 12px rgba(0,0,0,0.03)"}}>
+                {CATEGORY_EMOJI[books[0].category] || "📖"}
+              </div>
+              <div style={{textAlign: "left", flex: 1}}>
+                <div style={{display:"inline-block", background:"#f0f9f0", color:"#4a8c5a", padding:"4px 12px", borderRadius:100, fontSize:11, fontWeight:800, marginBottom:8}}>
+                  {books[0].category}
+                </div>
+                <h3 style={{margin: "0 0 6px", fontSize: 20, color: "#3d5c46", fontWeight: 800, lineHeight: 1.3}}>
+                  {books[0].title}
+                </h3>
+                <p style={{margin: 0, fontSize: 13, color: "#8aab94", fontWeight: 700}}>
+                  さく：{books[0].author}
+                </p>
+              </div>
+              <div style={{background:"#fdf8ef", width:36, height:36, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:"#6daa7a", flexShrink:0}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </div>
+            </div>
+          ) : (
+             <div style={{padding: 24, color: "#8aab94", fontWeight: 700}}>まだ絵本がありません</div>
+          )}
+          <div style={{marginTop: 24, fontSize: 13, fontWeight: 700, color: "#6daa7a", background: "#fdf8ef", border: "2px solid #e1eee4", padding: "8px 24px", borderRadius: 100, display: "inline-block", boxShadow:"0 2px 8px rgba(0,0,0,0.04)"}}>
+            ぜんぶで {books.length} さつの絵本があるよ🌿
+          </div>
         </div>
-      </header>
+      </section>
       <div style={{maxWidth:860,margin:"0 auto",padding:"0 24px 28px",position:"relative",zIndex:10}}>
         <p style={{textAlign:"center",color:"#8aab94",fontWeight:700,fontSize:12,marginBottom:14}}>カテゴリーでさがす</p>
         <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:10}}>
