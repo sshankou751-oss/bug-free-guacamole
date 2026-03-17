@@ -1,9 +1,320 @@
-﻿import React, { useState, useEffect } from "react"
+﻿import { useState, useEffect, useRef } from "react"
 import { supabase } from "../lib/supabaseClient"
 
 const CATEGORIES = ["全部", "クレイえほん", "サイレントストーリー", "えほん", "シリーズ絵本"]
 const CATEGORY_EMOJI = {
-  "全部": "🌳", "クレイえほん": "🍄", "サイレントストーリー": "🦉", "えほん": "🐰", "シリーズ絵本": "🌰",
+  "全部": "🌳", "クレイえほん": "🍄", "サイレントストーリー": "🦉", "えほん": "🐰", "シリーズ絵本": "🍏",
+}
+
+const IS_DEV = import.meta.env.DEV
+
+const SLIDES = [
+  {
+    bg: "linear-gradient(135deg,#d4ead4 0%,#b8d8c0 50%,#f4e8d0 100%)",
+    emoji: "🌿",
+    badge: "✨ NEW ✨",
+    title: "新作のお知らせ",
+    sub: "もうすぐ　あたらしい絵本が　やってくるよ 🐰",
+  },
+  {
+    bg: "linear-gradient(135deg,#e8d4c0 0%,#d4b89a 50%,#f4e8d0 100%)",
+    emoji: "🍄",
+    badge: "クレイえほん",
+    title: "クレイえほん",
+    sub: "ねんどで　つくった　ふしぎな　せかい 🍄",
+  },
+  {
+    bg: "linear-gradient(135deg,#1a2a3a 0%,#2d4a6a 50%,#3a5c7a 100%)",
+    emoji: "🦉",
+    badge: "サイレントストーリー",
+    title: "サイレントストーリー",
+    sub: "ことばなしで　つたわる　ものがたり 🌙",
+    dark: true,
+  },
+  {
+    bg: "linear-gradient(135deg,#fde8f0 0%,#f9c5d8 50%,#fff0f5 100%)",
+    emoji: "🐰",
+    badge: "えほん",
+    title: "えほん",
+    sub: "やさしい　ことばで　おはなし 🌸",
+  },
+  {
+    bg: "linear-gradient(135deg,#f4e8d0 0%,#e8c88a 50%,#d4a84a 100%)",
+    emoji: "🌰",
+    badge: "シリーズ絵本",
+    title: "シリーズ絵本",
+    sub: "つながる　ものがたりの　せかい 🌰",
+  },
+]
+
+const isVideo = (url) => url && (url.includes(".mp4") || url.includes(".webm") || url.includes(".mov"))
+
+function HeroSection({ selectedIndex }) {
+  const [current, setCurrent] = useState(0)
+
+  useEffect(() => {
+    setCurrent(selectedIndex)
+  }, [selectedIndex])
+  const [dragging, setDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [images, setImages] = useState([null, null, null, null, null])
+  const [focused, setFocused] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  const fileInputRef = useRef(null)
+  const wrapRef = useRef(null)
+  const total = SLIDES.length
+
+  const prev = () => setCurrent(c => (c - 1 + total) % total)
+  const next = () => setCurrent(c => (c + 1) % total)
+
+  const onPointerDown = (e) => { setDragging(true); setStartX(e.clientX) }
+  const onPointerUp = (e) => {
+    if (!dragging) return
+    setDragging(false)
+    const diff = e.clientX - startX
+    if (diff < -40) next()
+    else if (diff > 40) prev()
+  }
+
+  // デプロイ版でも画像を取得
+  useEffect(() => {
+    async function fetchHeroImages() {
+      const { data } = await supabase.from("hero_slides").select("*")
+      if (!data) return
+      setImages(imgs => {
+        const next = [...imgs]
+        data.forEach(row => { if (row.slide_index >= 0 && row.slide_index < next.length) next[row.slide_index] = row.image_url })
+        return next
+      })
+    }
+    fetchHeroImages()
+  }, [])
+
+  // ローカル版のみペースト機能
+  useEffect(() => {
+    if (!IS_DEV) return
+    const el = wrapRef.current
+    if (!el) return
+    const handler = (e) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+      for (const item of items) {
+        if (item.type.startsWith("image/")) {
+          const url = URL.createObjectURL(item.getAsFile())
+          setImages(imgs => imgs.map((img, i) => i === current ? url : img))
+          break
+        }
+      }
+    }
+    el.addEventListener("paste", handler)
+    return () => el.removeEventListener("paste", handler)
+  }, [current])
+
+  const clearImage = (e) => {
+    e.stopPropagation()
+    setImages(imgs => imgs.map((img, i) => i === current ? null : img))
+  }
+
+  const deleteImage = async (e) => {
+    e.stopPropagation()
+    if (!confirm(`スライド${current + 1}のメディアを削除しますか？`)) return
+    try {
+      await supabase.storage.from("hiro-images").remove([
+        `slide_${current}.png`, `slide_${current}.jpg`,
+        `slide_${current}.mp4`, `slide_${current}.webm`, `slide_${current}.mov`
+      ])
+      await supabase.from("hero_slides").delete().eq("slide_index", current)
+      setImages(imgs => imgs.map((img, i) => i === current ? null : img))
+    } catch (err) {
+      alert("削除エラー: " + err.message)
+    }
+  }
+
+  const selectVideo = (e) => {
+    e.stopPropagation()
+    fileInputRef.current?.click()
+  }
+
+  const onVideoSelected = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setImages(imgs => imgs.map((img, i) => i === current ? url : img))
+    e.target.value = ""
+  }
+
+  const publishImage = async (e) => {
+    e.stopPropagation()
+    const blobUrl = images[current]
+    if (!blobUrl || !blobUrl.startsWith("blob:")) return
+    setPublishing(true)
+    try {
+      const res = await fetch(blobUrl)
+      const blob = await res.blob()
+      let ext = "jpg"
+      if (blob.type.includes("png")) ext = "png"
+      else if (blob.type.includes("mp4")) ext = "mp4"
+      else if (blob.type.includes("webm")) ext = "webm"
+      else if (blob.type.includes("mov") || blob.type.includes("quicktime")) ext = "mov"
+      const path = `slide_${current}.${ext}`
+      const { error: upErr } = await supabase.storage.from("hiro-images").upload(path, blob, { upsert: true, contentType: blob.type })
+      if (upErr) { alert("アップロードエラー: " + upErr.message); setPublishing(false); return }
+      const { data: { publicUrl } } = supabase.storage.from("hiro-images").getPublicUrl(path)
+      const { error: dbErr } = await supabase.from("hero_slides").upsert({ slide_index: current, image_url: publicUrl }, { onConflict: "slide_index" })
+      if (dbErr) { alert("保存エラー: " + dbErr.message); setPublishing(false); return }
+      alert("公開しました！")
+    } catch (err) {
+      alert("エラー: " + err.message)
+    }
+    setPublishing(false)
+  }
+
+  return (
+    <div
+      ref={wrapRef}
+      tabIndex={IS_DEV ? 0 : undefined}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      onClick={() => IS_DEV && wrapRef.current?.focus()}
+      style={{
+        width: "100%",
+        maxWidth: 900,
+        height: "clamp(180px, 28vw, 380px)",
+        margin: "0 auto",
+        position: "relative",
+        overflow: "hidden",
+        borderBottom: "2px solid #e1eee4",
+        cursor: "grab",
+        userSelect: "none",
+        outline: "none",
+        boxShadow: IS_DEV && focused ? "inset 0 0 0 3px #6daa7a" : "none",
+      }}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerLeave={() => setDragging(false)}
+    >
+      {/* スライド */}
+      <div style={{
+        display: "flex",
+        width: `${total * 100}%`,
+        height: "100%",
+        transform: `translateX(-${current * (100 / total)}%)`,
+        transition: "transform 0.4s cubic-bezier(.4,0,.2,1)",
+      }}>
+        {SLIDES.map((s, i) => (
+          <div key={i} style={{
+            width: `${100 / total}%`,
+            height: "100%",
+            background: images[i] ? "none" : s.bg,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 16,
+            fontFamily: "'Zen Maru Gothic','Hiragino Maru Gothic Pro',sans-serif",
+            flexShrink: 0,
+            position: "relative",
+          }}>
+            {images[i] ? (
+              isVideo(images[i]) ? (
+                <video src={images[i]} autoPlay muted loop playsInline style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+              ) : (
+                <img src={images[i]} alt={s.title} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} />
+              )
+            ) : (
+              <>
+                <div style={{fontSize:"clamp(28px,4vw,44px)"}}>{s.emoji}</div>
+                <div style={{
+                  background: s.dark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.75)",
+                  borderRadius: 24,
+                  padding: "clamp(14px,2vw,22px) clamp(24px,4vw,52px)",
+                  textAlign: "center",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+                  backdropFilter: "blur(6px)",
+                  border: s.dark ? "2px solid rgba(255,255,255,0.15)" : "2px solid rgba(200,224,202,0.7)",
+                }}>
+                  <p style={{margin:"0 0 6px",fontSize:"clamp(10px,1.2vw,13px)",fontWeight:800,color: s.dark?"#aad4ff":"#6daa7a",letterSpacing:"0.2em"}}>{s.badge}</p>
+                  <p style={{margin:0,fontSize:"clamp(18px,2.4vw,26px)",fontWeight:800,color: s.dark?"#fff":"#3d5c46",letterSpacing:"0.05em"}}>{s.title}</p>
+                  <p style={{margin:"8px 0 0",fontSize:"clamp(11px,1.2vw,14px)",color: s.dark?"rgba(255,255,255,0.7)":"#8aab94",fontWeight:700}}>{s.sub}</p>
+                </div>
+                {IS_DEV && i === current && (
+                  <p style={{position:"absolute",bottom:16,fontSize:11,color: s.dark?"rgba(255,255,255,0.5)":"rgba(100,140,110,0.6)",fontWeight:700}}>
+                    クリックして Ctrl+V で画像をペースト
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* 動画ファイル選択（非表示） */}
+      {IS_DEV && (
+        <input ref={fileInputRef} type="file" accept="video/mp4,video/webm,video/quicktime" style={{display:"none"}} onChange={onVideoSelected} />
+      )}
+
+      {/* ローカル版ボタン群 */}
+      {IS_DEV && (
+        <div style={{position:"absolute",top:10,right:10,zIndex:20,display:"flex",gap:8}}>
+          {images[current]?.startsWith("blob:") && (
+            <button onClick={publishImage} disabled={publishing} style={{
+              background: publishing ? "rgba(109,170,122,0.6)" : "linear-gradient(135deg,#6daa7a,#4a8c5a)",
+              color:"white",border:"none",borderRadius:8,padding:"6px 14px",
+              cursor: publishing ? "default" : "pointer",fontSize:12,fontWeight:700,
+              boxShadow:"0 2px 8px rgba(0,0,0,0.2)",
+            }}>{publishing ? "公開中..." : "🌿 公開する"}</button>
+          )}
+          {images[current] && !images[current].startsWith("blob:") && (
+            <button onClick={deleteImage} style={{
+              background:"linear-gradient(135deg,#e57373,#c0392b)",color:"white",border:"none",
+              borderRadius:8,padding:"6px 14px",cursor:"pointer",fontSize:12,fontWeight:700,
+              boxShadow:"0 2px 8px rgba(0,0,0,0.2)",
+            }}>🗑 削除</button>
+          )}
+          {!images[current] && (
+            <button onClick={selectVideo} style={{
+              background:"linear-gradient(135deg,#7a6daa,#5a4a8c)",color:"white",border:"none",
+              borderRadius:8,padding:"6px 14px",cursor:"pointer",fontSize:12,fontWeight:700,
+              boxShadow:"0 2px 8px rgba(0,0,0,0.2)",
+            }}>🎬 動画</button>
+          )}
+          {images[current] && (
+            <button onClick={clearImage} style={{
+              background:"rgba(0,0,0,0.45)",color:"white",border:"none",
+              borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:12,fontWeight:700,
+            }}>✕ クリア</button>
+          )}
+        </div>
+      )}
+
+      {/* 左右ボタン */}
+      {[{pos:{left:12},label:"‹",fn:prev},{pos:{right:12},label:"›",fn:next}].map(({pos,label,fn}) => (
+        <button key={label} onClick={fn} style={{
+          position:"absolute",top:"50%",transform:"translateY(-50%)",
+          ...pos,
+          width:"clamp(32px,4vw,44px)",height:"clamp(32px,4vw,44px)",
+          borderRadius:"50%",border:"none",
+          background:"rgba(255,255,255,0.82)",
+          color:"#4a8c5a",fontSize:"clamp(18px,2.5vw,28px)",fontWeight:900,
+          cursor:"pointer",
+          boxShadow:"0 2px 10px rgba(0,0,0,0.12)",
+          display:"flex",alignItems:"center",justifyContent:"center",
+          lineHeight:1, zIndex:10,
+        }}>{label}</button>
+      ))}
+
+      {/* ドット */}
+      <div style={{position:"absolute",bottom:14,left:"50%",transform:"translateX(-50%)",display:"flex",gap:8,zIndex:10}}>
+        {SLIDES.map((_,i) => (
+          <div key={i} onClick={()=>setCurrent(i)} style={{
+            width:i===current?20:8,height:8,borderRadius:4,
+            background:i===current?"#6daa7a":"rgba(109,170,122,0.35)",
+            cursor:"pointer",transition:"all 0.3s",
+          }} />
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export default function EhonForest({ onSelectBook }) {
@@ -55,60 +366,8 @@ export default function EhonForest({ onSelectBook }) {
           {toast}
         </div>
       )}
-      {/* ヒーロービジュアル（おすすめ・最新情報） */}
-      <section style={{maxWidth: 860, margin: "32px auto 40px", padding: "0 24px", position: "relative", zIndex: 10}}>
-        <div style={{
-          background: "linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6))",
-          backdropFilter: "blur(12px)",
-          borderRadius: 28,
-          padding: "36px 32px",
-          boxShadow: "0 12px 40px rgba(109, 170, 122, 0.12)",
-          border: "4px solid rgba(255,255,255,0.8)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center"
-        }}>
-          <h2 style={{fontSize: 22, fontWeight: 800, color: "#4a8c5a", margin: "0 0 8px", display:"flex", alignItems:"center", gap:8}}>
-            <span style={{fontSize:26}}>🕊️</span> もりのおしらせ
-          </h2>
-          <p style={{fontSize: 14, color: "#8aab94", margin: "0 0 28px", fontWeight: 700}}>
-            絵本のもりの最新情報や、これからの予定だよ！
-          </p>
-
-          <div style={{display: "flex", justifyContent: "center", padding: "12px 12px 24px", width: "100%"}}>
-            
-            {/* 次回予告の動画カード（1枚のみ） */}
-            <div style={{display: "flex", flexDirection: "column", background: "white", borderRadius: 24, padding: "24px", gap: 16, alignItems: "center", width: "min(100%, 500px)", boxShadow: "0 8px 32px rgba(109,170,122,0.18)", border: "2px solid #e1eee4", position: "relative"}}>
-              <div style={{position:"absolute", top:-12, left:-12, background:"#ff9eaf", color:"white", fontWeight:800, fontSize:14, padding:"6px 16px", borderRadius:100, transform:"rotate(-4deg)", boxShadow:"0 4px 12px rgba(255,158,175,0.4)"}}>次回予告！</div>
-              
-              {/* 動画エリア */}
-              <div style={{width: "100%", borderRadius: 16, overflow: "hidden", background: "#fdf8ef", boxShadow:"inset 0 2px 12px rgba(0,0,0,0.03)", position: "relative", aspectRatio: "16/9"}}>
-                {/* 実際の動画を使う時は、publicフォルダに video.mp4 などを置き、src="/video.mp4" と指定してください */}
-                <video 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline 
-                  style={{width: "100%", height: "100%", objectFit: "cover"}}
-                  src="https://cdn.pixabay.com/video/2021/08/04/83866-584711317_tiny.mp4"
-                ></video>
-              </div>
-              
-              <div style={{textAlign: "center", width: "100%"}}>
-                <div style={{display:"inline-block", background:"#fce8e8", color:"#d46a6a", padding:"4px 14px", borderRadius:100, fontSize:11, fontWeight:800, marginBottom:10}}>よてい</div>
-                <h3 style={{margin: "0 0 8px", fontSize: 20, color: "#3d5c46", fontWeight: 800, lineHeight: 1.4}}>
-                  新しい絵本をせいさく中！
-                </h3>
-                <p style={{margin: 0, fontSize: 14, color: "#8aab94", fontWeight: 700}}>
-                  どんなおはなしになるかな？おたのしみに✨
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
+      {/* ヒーローセクション 1920×1006 */}
+      <HeroSection selectedIndex={CATEGORIES.indexOf(selectedCategory)} />
       <div style={{maxWidth:860,margin:"0 auto",padding:"0 24px 28px",position:"relative",zIndex:10}}>
         <p style={{textAlign:"center",color:"#8aab94",fontWeight:700,fontSize:12,marginBottom:14}}>カテゴリーでさがす</p>
         <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:10}}>
