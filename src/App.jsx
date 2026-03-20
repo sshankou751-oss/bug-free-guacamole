@@ -88,7 +88,7 @@ function App() {
               }
             }
           `}</style>
-          <header style={{position:"sticky",top:0,zIndex:50,padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
+          <header style={{position:"relative",padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
             <div style={{position:"relative",lineHeight:0}}>
               {/* バナー画像 */}
               <img src="/header-banner-v3.png" alt="絵本のもり"
@@ -96,16 +96,20 @@ function App() {
                 className="header-banner" />
               {/* ボタン群：右上に重ねて表示 */}
               <div style={{position:"absolute",top:"50%",right:16,transform:"translateY(-50%)",display:"flex",alignItems:"center",gap:8,zIndex:1}}>
-                {session && viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
+                {viewState !== "create" && viewState !== "mybooks" && viewState !== "auth" && !selectedBookId && (
                   <>
-                    <button onClick={handleShowMyBooks} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 14px",background:"rgba(255,255,255,0.85)",color:"#4a8c5a",fontWeight:700,borderRadius:100,border:"1.5px solid #c8e0ca",cursor:"pointer",fontSize:13,fontFamily:"inherit",backdropFilter:"blur(4px)"}}>
-                      <Star style={{width:14,height:14}} />
-                      きみの作品
-                    </button>
-                    <button onClick={handleStartCreating} style={{display:"flex",alignItems:"center",gap:4,padding:"8px 18px",background:"linear-gradient(135deg,#6daa7a,#8dc49a)",color:"white",fontWeight:700,borderRadius:100,border:"none",cursor:"pointer",fontSize:13,fontFamily:"inherit",boxShadow:"0 3px 10px rgba(109,170,122,0.4)"}}>
-                      <Plus style={{width:15,height:15}} />
-                      つくる
-                    </button>
+                    {session && (
+                      <button onClick={handleShowMyBooks} style={{display:"flex",alignItems:"center",gap:4,padding:"6px 14px",background:"rgba(255,255,255,0.85)",color:"#4a8c5a",fontWeight:700,borderRadius:100,border:"1.5px solid #c8e0ca",cursor:"pointer",fontSize:13,fontFamily:"inherit",backdropFilter:"blur(4px)"}}>
+                        <Star style={{width:14,height:14}} />
+                        きみの作品
+                      </button>
+                    )}
+                    {import.meta.env.DEV && (
+                      <button onClick={handleStartCreating} style={{display:"flex",alignItems:"center",gap:4,padding:"8px 18px",background:"linear-gradient(135deg,#6daa7a,#8dc49a)",color:"white",fontWeight:700,borderRadius:100,border:"none",cursor:"pointer",fontSize:13,fontFamily:"inherit",boxShadow:"0 3px 10px rgba(109,170,122,0.4)"}}>
+                        <Plus style={{width:15,height:15}} />
+                        つくる
+                      </button>
+                    )}
                   </>
                 )}
                 {(viewState === "create" || viewState === "mybooks" || viewState === "auth") && (
@@ -121,6 +125,12 @@ function App() {
               </div>
             </div>
           </header>
+
+          {/* プレオープンバナー */}
+          <div style={{background:"linear-gradient(90deg,#f9d0dc,#fce4ec,#f9d0dc)",backgroundSize:"200% 100%",animation:"shimmer 3s ease infinite",textAlign:"center",padding:"7px 16px",fontSize:13,fontWeight:700,color:"#c0436a",letterSpacing:"0.08em",fontFamily:"inherit"}}>
+            <style>{`@keyframes shimmer{0%{background-position:0% 0%}50%{background-position:100% 0%}100%{background-position:0% 0%}}`}</style>
+            🌸 ４月公開予定　プレオープン中　🌸
+          </div>
 
           <main>
             {viewState === "create" ? (
