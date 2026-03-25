@@ -401,9 +401,11 @@ export default function EhonForest({ onSelectBook }) {
                   </div>
                   <h3 style={{fontSize:17,fontWeight:700,color:"#3d5c46",margin:"0 0 8px",lineHeight:1.4,fontFamily:"inherit"}}>{book.title}</h3>
                   <p style={{fontSize:12,color:"#8aab94",margin:"0 0 18px",fontFamily:"inherit"}}>{book.author || "森の作者"}</p>
-                  <button onClick={() => onSelectBook(book.id)} style={{width:"100%",padding:"11px 0",background:"linear-gradient(135deg,#f4895a,#f9ae7a)",color:"white",fontWeight:700,fontSize:15,fontFamily:"inherit",borderRadius:14,border:"none",cursor:"pointer",boxShadow:"0 4px 12px rgba(244,137,90,0.28)",transition:"all 0.2s"}}
-                    onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 20px rgba(244,137,90,0.35)"}}
-                    onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 4px 12px rgba(244,137,90,0.28)"}}>
+                  <button onClick={() => onSelectBook(book.id)} style={{width:"100%",padding:"12px 24px",background:"linear-gradient(180deg,#f9ae7a 0%,#f4895a 100%)",color:"white",fontWeight:700,fontSize:15,fontFamily:"inherit",borderRadius:14,border:"none",cursor:"pointer",boxShadow:"0 6px 0 #c95e30, 0 8px 16px rgba(244,137,90,0.35)",transition:"all 0.12s",transform:"translateY(0)"}}
+                    onMouseEnter={e=>{e.currentTarget.style.background="linear-gradient(180deg,#fbbe8a 0%,#f79a6a 100%)"}}
+                    onMouseLeave={e=>{e.currentTarget.style.background="linear-gradient(180deg,#f9ae7a 0%,#f4895a 100%)";e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 6px 0 #c95e30, 0 8px 16px rgba(244,137,90,0.35)"}}
+                    onMouseDown={e=>{e.currentTarget.style.transform="translateY(4px)";e.currentTarget.style.boxShadow="0 2px 0 #c95e30, 0 4px 8px rgba(244,137,90,0.25)"}}
+                    onMouseUp={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 6px 0 #c95e30, 0 8px 16px rgba(244,137,90,0.35)"}}>
                     ひらく！
                   </button>
                 </div>
