@@ -32,13 +32,6 @@ const SLIDES = [
     dark: true,
   },
   {
-    bg: "linear-gradient(135deg,#fde8f0 0%,#f9c5d8 50%,#fff0f5 100%)",
-    emoji: "🐰",
-    badge: "えほん",
-    title: "えほん",
-    sub: "やさしい　ことばで　おはなし 🌸",
-  },
-  {
     bg: "linear-gradient(135deg,#f4e8d0 0%,#e8c88a 50%,#d4a84a 100%)",
     emoji: "🌰",
     badge: "シリーズ絵本",
@@ -57,7 +50,7 @@ function HeroSection({ selectedIndex }) {
   }, [selectedIndex])
   const [dragging, setDragging] = useState(false)
   const [startX, setStartX] = useState(0)
-  const [images, setImages] = useState([null, null, null, null, null])
+  const [images, setImages] = useState([null, null, null, null])
   const [focused, setFocused] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const fileInputRef = useRef(null)
