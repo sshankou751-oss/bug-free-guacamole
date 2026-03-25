@@ -1,9 +1,9 @@
 ﻿import { useState, useEffect, useRef } from "react"
 import { supabase } from "../lib/supabaseClient"
 
-const CATEGORIES = ["全部", "クレイえほん", "サイレントストーリー", "シリーズ絵本"]
+const CATEGORIES = ["全部", "クレイえほん", "サイレント", "シリーズ絵本"]
 const CATEGORY_EMOJI = {
-  "全部": "🌳", "クレイえほん": "🍄", "サイレントストーリー": "🦉", "シリーズ絵本": "🍏",
+  "全部": "🌳", "クレイえほん": "🍄", "サイレント": "🦉", "シリーズ絵本": "🍏",
 }
 
 const IS_DEV = import.meta.env.DEV
@@ -26,8 +26,8 @@ const SLIDES = [
   {
     bg: "linear-gradient(135deg,#1a2a3a 0%,#2d4a6a 50%,#3a5c7a 100%)",
     emoji: "🦉",
-    badge: "サイレントストーリー",
-    title: "サイレントストーリー",
+    badge: "サイレント",
+    title: "サイレント",
     sub: "ことばなしで　つたわる　ものがたり 🌙",
     dark: true,
   },

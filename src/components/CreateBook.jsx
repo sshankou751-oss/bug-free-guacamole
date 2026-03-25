@@ -17,7 +17,7 @@ const sortFilesByName = (files) => {
   })
 }
 
-const BOOK_CATEGORIES = ['クレイえほん', 'サイレントストーリー', 'シリーズ絵本']
+const BOOK_CATEGORIES = ['クレイえほん', 'サイレント', 'シリーズ絵本']
 
 export default function CreateBook({ onCancel, onComplete, initialData }) {
   const [title, setTitle] = useState(initialData?.title || '')
