@@ -1,9 +1,9 @@
 ﻿import { useState, useEffect, useRef } from "react"
 import { supabase } from "../lib/supabaseClient"
 
-const CATEGORIES = ["全部", "クレイえほん", "サイレントストーリー", "えほん", "シリーズ絵本"]
+const CATEGORIES = ["全部", "クレイえほん", "サイレントストーリー", "シリーズ絵本"]
 const CATEGORY_EMOJI = {
-  "全部": "🌳", "クレイえほん": "🍄", "サイレントストーリー": "🦉", "えほん": "🐰", "シリーズ絵本": "🍏",
+  "全部": "🌳", "クレイえほん": "🍄", "サイレントストーリー": "🦉", "シリーズ絵本": "🍏",
 }
 
 const IS_DEV = import.meta.env.DEV

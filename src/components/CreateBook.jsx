@@ -17,12 +17,12 @@ const sortFilesByName = (files) => {
   })
 }
 
-const BOOK_CATEGORIES = ['クレイえほん', 'サイレントストーリー', 'えほん', 'シリーズ絵本']
+const BOOK_CATEGORIES = ['クレイえほん', 'サイレントストーリー', 'シリーズ絵本']
 
 export default function CreateBook({ onCancel, onComplete, initialData }) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [description, setDescription] = useState(initialData?.description || '')
-  const [category, setCategory] = useState(initialData?.category || 'えほん')
+  const [category, setCategory] = useState(initialData?.category || 'クレイえほん')
   const [pages, setPages] = useState([]) // { file, preview, id }
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
