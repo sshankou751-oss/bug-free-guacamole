@@ -397,11 +397,19 @@ export default function EhonForest({ onSelectBook }) {
                   </div>
                   <h3 style={{fontSize:17,fontWeight:700,color:"#3d5c46",margin:"0 0 8px",lineHeight:1.4,fontFamily:"inherit"}}>{book.title}</h3>
                   <p style={{fontSize:12,color:"#8aab94",margin:"0 0 18px",fontFamily:"inherit"}}>{book.author || "森の作者"}</p>
-                  <button onClick={() => onSelectBook(book.id)} style={{width:"100%",padding:"12px 24px",background:"linear-gradient(180deg,#f9ae7a 0%,#f4895a 100%)",color:"white",fontWeight:700,fontSize:15,fontFamily:"inherit",borderRadius:14,border:"none",cursor:"pointer",boxShadow:"0 6px 0 #c95e30, 0 8px 16px rgba(244,137,90,0.35)",transition:"all 0.12s",transform:"translateY(0)"}}
-                    onMouseEnter={e=>{e.currentTarget.style.background="linear-gradient(180deg,#fbbe8a 0%,#f79a6a 100%)"}}
-                    onMouseLeave={e=>{e.currentTarget.style.background="linear-gradient(180deg,#f9ae7a 0%,#f4895a 100%)";e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 6px 0 #c95e30, 0 8px 16px rgba(244,137,90,0.35)"}}
-                    onMouseDown={e=>{e.currentTarget.style.transform="translateY(4px)";e.currentTarget.style.boxShadow="0 2px 0 #c95e30, 0 4px 8px rgba(244,137,90,0.25)"}}
-                    onMouseUp={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="0 6px 0 #c95e30, 0 8px 16px rgba(244,137,90,0.35)"}}>
+                  <button className="cta-btn" style={{fontFamily:"inherit"}} onClick={(e) => {
+                    const btn = e.currentTarget
+                    const circle = document.createElement("span")
+                    const diameter = Math.max(btn.clientWidth, btn.clientHeight)
+                    const rect = btn.getBoundingClientRect()
+                    circle.style.width = circle.style.height = `${diameter}px`
+                    circle.style.left = `${e.clientX - rect.left - diameter / 2}px`
+                    circle.style.top = `${e.clientY - rect.top - diameter / 2}px`
+                    circle.classList.add("ripple")
+                    btn.querySelector(".ripple")?.remove()
+                    btn.appendChild(circle)
+                    onSelectBook(book.id)
+                  }}>
                     ひらく！
                   </button>
                 </div>

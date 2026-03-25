@@ -24,6 +24,51 @@
   min-height: 100vh;
 }
 
+/* CTAボタン マイクロインタラクション */
+.cta-btn {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 12px 24px;
+  background: linear-gradient(180deg, #f9ae7a 0%, #f4895a 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #c95e30, 0 8px 16px rgba(244,137,90,0.35);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+  transform: translateY(0);
+}
+
+.cta-btn:hover {
+  background: linear-gradient(180deg, #fbbe8a 0%, #f79a6a 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 0 #c95e30, 0 12px 20px rgba(244,137,90,0.4);
+}
+
+.cta-btn:active {
+  transform: translateY(4px) scale(0.98);
+  box-shadow: 0 2px 0 #c95e30, 0 4px 8px rgba(244,137,90,0.25);
+}
+
+@keyframes ripple-anim {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.cta-btn .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  transform: scale(0);
+  animation: ripple-anim 0.55s linear;
+  pointer-events: none;
+}
+
 .app-header {
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
