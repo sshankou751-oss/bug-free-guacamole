@@ -44,10 +44,6 @@ const isVideo = (url) => url && (url.includes(".mp4") || url.includes(".webm") |
 
 function HeroSection({ selectedIndex }) {
   const [current, setCurrent] = useState(0)
-
-  useEffect(() => {
-    setCurrent(selectedIndex)
-  }, [selectedIndex])
   const [dragging, setDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [images, setImages] = useState([null, null, null, null])
