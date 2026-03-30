@@ -75,17 +75,9 @@ function App() {
           <style>{`
             .header-banner {
               width: 100% !important;
-              height: 80px !important;
-              object-fit: contain !important;
-              object-position: left center !important;
+              height: auto !important;
               display: block !important;
               cursor: pointer !important;
-            }
-            @media (max-width: 768px) {
-              .header-banner {
-                height: 60px !important;
-                object-position: center center !important;
-              }
             }
           `}</style>
           <header style={{position:"relative",padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>

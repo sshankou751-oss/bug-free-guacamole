@@ -33,10 +33,10 @@ const SLIDES = [
   },
   {
     bg: "linear-gradient(135deg,#f4e8d0 0%,#e8c88a 50%,#d4a84a 100%)",
-    emoji: "🌰",
+    emoji: "🍏",
     badge: "シリーズ絵本",
     title: "シリーズ絵本",
-    sub: "つながる　ものがたりの　せかい 🌰",
+    sub: "つながる　ものがたりの　せかい 🍏",
   },
 ]
 
@@ -167,7 +167,6 @@ function HeroSection({ selectedIndex }) {
       onClick={() => IS_DEV && wrapRef.current?.focus()}
       style={{
         width: "100%",
-        maxWidth: 900,
         height: "clamp(180px, 28vw, 380px)",
         margin: "0 auto",
         position: "relative",
