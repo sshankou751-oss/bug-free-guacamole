@@ -425,12 +425,12 @@ export default function EhonForest({ onSelectBook }) {
         )}
       </main>
       <footer style={{textAlign:"center",padding:"40px 24px",background:"rgba(255,255,255,0.5)",borderTop:"2px solid #e4f0e4",position:"relative",zIndex:10}}>
-        <img src="/og-logo-v2.png" alt="絵本のもり" style={{height:52,width:"auto",margin:"0 auto 10px",display:"block",opacity:0.45}} />
-        <p style={{color:"#8aab94",fontSize:13,margin:"16px 0 8px",fontFamily:"inherit"}}>アップルちゃんをもっと詳しく見たい方はこちら 🍏</p>
-        <a href="https://apple.ehonnomori-studio.com" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",margin:"0 auto",padding:"8px 20px",background:"linear-gradient(135deg,#a8d5a2,#6daa7a)",color:"white",borderRadius:20,fontSize:13,fontWeight:700,textDecoration:"none",fontFamily:"inherit",boxShadow:"0 2px 8px rgba(109,170,122,0.3)"}}>
+        <p style={{color:"#8aab94",fontSize:13,margin:"0 0 8px",fontFamily:"inherit"}}>アップルちゃんをもっと詳しく見たい方はこちら 🍏</p>
+        <a href="https://apple.ehonnomori-studio.com" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",margin:"0 auto 24px",padding:"8px 20px",background:"linear-gradient(135deg,#a8d5a2,#6daa7a)",color:"white",borderRadius:20,fontSize:13,fontWeight:700,textDecoration:"none",fontFamily:"inherit",boxShadow:"0 2px 8px rgba(109,170,122,0.3)"}}>
           🍏 アップルちゃんのサイトへ
         </a>
-        <p style={{color:"#aac8aa",fontSize:12,margin:"16px 0 0",fontFamily:"inherit"}}>© 絵本のもり</p>
+        <img src="/og-logo-v2.png" alt="絵本のもり" style={{height:52,width:"auto",margin:"0 auto 10px",display:"block",opacity:0.45}} />
+        <p style={{color:"#aac8aa",fontSize:12,margin:0,fontFamily:"inherit"}}>© 絵本のもり</p>
       </footer>
     </div>
   )
