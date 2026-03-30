@@ -75,7 +75,9 @@ function App() {
           <style>{`
             .header-banner {
               width: 100% !important;
-              height: auto !important;
+              height: clamp(320px, 40vw, 540px) !important;
+              object-fit: cover !important;
+              object-position: center 25% !important;
               display: block !important;
               cursor: pointer !important;
             }
@@ -83,7 +85,7 @@ function App() {
           <header style={{position:"relative",padding:0,boxShadow:"0 2px 16px rgba(109,170,122,0.12)"}}>
             <div style={{position:"relative",lineHeight:0}}>
               {/* バナー画像 */}
-              <img src="/header-banner-v3.png" alt="絵本のもり"
+              <img src="/header-banner-v4.png" alt="絵本のもり"
                 onClick={handleBackToList}
                 className="header-banner" />
               {/* ボタン群：右上に重ねて表示 */}
