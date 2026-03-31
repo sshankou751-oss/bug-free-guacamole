@@ -422,6 +422,14 @@ export default function EhonForest({ onSelectBook }) {
             <p style={{color:"#8aab94",fontFamily:"inherit"}}>きみの物語で、この森をいっぱいにしよう！</p>
           </div>
         )}
+      {selectedCategory === "シリーズ絵本" && (
+        <div style={{textAlign:"center",padding:"32px 24px 48px",position:"relative",zIndex:10}}>
+          <p style={{color:"#8aab94",fontSize:13,margin:"0 0 10px",fontFamily:"inherit"}}>アップルちゃんをもっと詳しく見たい方はこちら 🍏</p>
+          <a href="https://apple.ehonnomori-studio.com" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",padding:"12px 28px",background:"linear-gradient(135deg,#a8d5a2,#6daa7a)",color:"white",borderRadius:100,fontSize:15,fontWeight:700,textDecoration:"none",fontFamily:"inherit",boxShadow:"0 4px 16px rgba(109,170,122,0.35)"}}>
+            🍏 アップルちゃんのサイトへ
+          </a>
+        </div>
+      )}
       </main>
       <footer style={{textAlign:"center",padding:"40px 24px",background:"rgba(255,255,255,0.5)",borderTop:"2px solid #e4f0e4",position:"relative",zIndex:10}}>
         <p style={{color:"#8aab94",fontSize:13,margin:"0 0 8px",fontFamily:"inherit"}}>アップルちゃんをもっと詳しく見たい方はこちら 🍏</p>
