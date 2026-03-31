@@ -120,12 +120,6 @@ function App() {
             </div>
           </header>
 
-          {/* プレオープンバナー */}
-          <div style={{background:"linear-gradient(90deg,#f9d0dc,#fce4ec,#f9d0dc)",backgroundSize:"200% 100%",animation:"shimmer 3s ease infinite",textAlign:"center",padding:"7px 16px",fontSize:13,fontWeight:700,color:"#c0436a",letterSpacing:"0.08em",fontFamily:"inherit"}}>
-            <style>{`@keyframes shimmer{0%{background-position:0% 0%}50%{background-position:100% 0%}100%{background-position:0% 0%}}`}</style>
-            🌸 ４月公開予定　プレオープン中　🌸
-          </div>
-
           <main>
             {viewState === "create" ? (
               <div style={{maxWidth:860,margin:"0 auto",padding:"40px 24px"}}>
