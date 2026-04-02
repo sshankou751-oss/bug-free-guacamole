@@ -75,9 +75,10 @@ function App() {
           <style>{`
             .header-banner {
               width: 100% !important;
-              height: 800px !important;
-              object-fit: contain !important;
-              object-position: center 25% !important;
+              height: auto !important;
+              max-height: 800px !important;
+              object-fit: cover !important;
+              object-position: center !important;
               display: block !important;
               cursor: pointer !important;
             }
